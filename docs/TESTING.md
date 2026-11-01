@@ -2,43 +2,49 @@
 
 ## Current prototype contents
 
-The Core 0.2.0 prototype contains:
-- Behavior pack: Aetherium Crystal item, Aetherium Crystal Block, two crafting recipes, a smoke-test function, and a test-kit function.
-- Resource pack: item and block texture atlases, English and Croatian language strings, and early placeholder PNG textures.
-- The behavior pack declares the resource pack as a dependency.
+The 0.3.0 development prototype contains:
+- Aetherium Crystal and Aetherium Crystal Block from the initial Core prototype.
+- Aetherium Ore, which is intended to generate in underground Overworld stone/deepslate.
+- Raw Aetherium Crystal dropped by the ore.
+- English and Croatian names for the new content.
+- A test-kit function that supplies sample items and blocks.
+
+The raw crystal and ore currently reuse early placeholder textures. They are temporary atlas references, not final art.
+
+## World-generation requirement
+
+The current custom feature/feature-rule approach may require the **Creation of Custom Biomes** experiment to be enabled in the test world, depending on the Bedrock release. Use a disposable world and record which experiments are enabled. A feature rule only affects newly generated chunks; explore fresh terrain after activating the pack.
 
 ## Import and in-game test
 
-1. Build the package with `python3 tools/build_mcaddon.py`, or import the behavior and resource packs separately.
-2. Open the package in Minecraft Bedrock and confirm that both packs import without warnings.
-3. Create a disposable Creative test world.
-4. Activate AETHERIUM Core. Confirm its resource-pack dependency is enabled as well.
-5. Enable cheats for the test world.
-6. Search the Creative inventory for Aetherium Crystal and Aetherium Crystal Block.
-7. Run `/function aetherium/core/test` to verify the pack function loads.
-8. Run `/function aetherium/core/test_kit` to receive 9 crystals and 1 crystal block for testing.
-9. Use the crafting table: 9 crystals should create 1 block; 1 block should return 9 crystals.
-10. Place and break the block. Confirm its texture displays and that it drops itself.
-11. Switch Minecraft language to Croatian and confirm the item/block display names are localized.
-12. Check the world/content log for manifest, texture, block, or recipe errors.
+1. Run the unit tests and static validator, then build with `python3 tools/build_mcaddon.py`.
+2. Import the package into Minecraft Bedrock and create a disposable Creative test world.
+3. Activate both AETHERIUM packs and enable cheats.
+4. If ore world generation does not activate, enable the required world-generation experiment in that disposable world and create fresh chunks.
+5. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
+6. Confirm the test kit includes Aetherium Crystal, Raw Aetherium Crystal, Aetherium Ore, and Aetherium Crystal Block.
+7. Locate Aetherium Ore in newly generated underground Overworld terrain, including stone and deepslate areas.
+8. Mine the ore and confirm it drops Raw Aetherium Crystal.
+9. Check the Creative inventory names in English and Croatian.
+10. Check the Content Log for feature, feature-rule, block, loot-table, texture, and manifest errors.
 
 ## Pass criteria
 
-- Both packs import and activate without invalid-manifest warnings.
-- The custom item appears with its intended icon and display name.
-- The custom block appears, places, breaks, and drops correctly.
-- Both recipes work in both directions.
-- Both Core test functions run successfully.
-- English and Croatian display names resolve correctly.
-- No unrelated vanilla gameplay is changed.
+- Both packs import and activate.
+- The test-kit function gives all four test resources.
+- The ore feature and feature rule load without Content Log errors.
+- New chunks in the target height range can generate the ore in the Overworld.
+- Mining the ore drops the raw crystal.
+- English and Croatian names resolve correctly.
 
 ## Before each release
 
+- Run `python3 -m unittest discover -s tools -p 'test_*.py' -v`.
 - Run `python3 tools/validate_pack.py`.
 - Build the .mcaddon and verify archive integrity.
 - Import into a clean Bedrock test world.
 - Test on Android and Windows Bedrock where available.
-- Check behavior with the other AETHERIUM modules enabled.
-- Record the exact Minecraft version and test result.
+- Test the same pack on the target Bedrock Dedicated Server.
+- Record the exact Minecraft version, platform, experiment settings, and test result.
 
-Repository-side JSON and package-structure checks do not replace the in-game test. The current prototype has not yet been confirmed inside Minecraft.
+Repository-side checks do not replace testing in the actual Bedrock engine. The current 0.3.0 prototype has not yet been confirmed inside Minecraft.
