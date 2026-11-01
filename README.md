@@ -2,7 +2,7 @@
 
 A modular, original technology-and-adventure add-on for Minecraft Bedrock Edition.
 
-> **Project status:** 0.3.1 development prototype – increased Aetherium ore generation attempts; in-game validation pending.  
+> **Project status:** 0.3.2 development prototype – seven-block Aetherium ore veins; in-game validation pending.  
 > **Target platforms:** Minecraft Bedrock on Android and Windows  
 > **Distribution goal:** One integrated add-on package; Marketplace readiness will be evaluated later.
 
@@ -22,7 +22,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - `aetherium:ore` – underground Overworld ore block.
 - `aetherium:raw_crystal` – raw material dropped by the ore.
 - Feature and feature-rule definitions distribute ore in underground Overworld stone/deepslate.
-- Ore placement attempts per chunk increased from 4 to 8 (twice the previous attempt count); vein size remains 5.
+- Ore placement attempts per chunk: 8; each generated vein has a configured size of up to 7 ore blocks.
 - English and Croatian localization for the current content.
 - A test-kit function supplies the current prototype resources.
 
@@ -40,9 +40,9 @@ The ore and raw-crystal now have separate original 16×16 pixel-art textures. Th
 6. **Aetherium Automation** – production planning and factory control.
 7. **Aetherium Reactors** – advanced multiblock power generation.
 8. **Aetherium Nature** – nature-based energy and alchemical technology.
-9. **The Lost Realms** – an original exploration dimension and progression layer.
+9. **The Lost Realms** – an original exploration dimension and progression layer. Its underground will be deliberately ore-rich, with Aetherium appearing frequently alongside the dimension's other ores.
 
-The modules above are planned features, not implemented functionality yet.
+The modules above are planned features, not implemented functionality yet. The Lost Realms will be an original AETHERIUM dimension, not a copy of another add-on's content or assets.
 
 ## Validate and build
 
