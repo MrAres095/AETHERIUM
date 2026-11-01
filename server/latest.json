@@ -1,0 +1,9 @@
+{
+  "project": "AETHERIUM",
+  "channel": "stable",
+  "latest_version": "0.1.0",
+  "package": "AETHERIUM-0.1.0.mcaddon",
+  "status": "development",
+  "tested_in_game": false,
+  "notes": "Initial Core scaffold only. Not yet a complete playable add-on."
+}
