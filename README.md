@@ -27,7 +27,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - English and Croatian localization for the current content.
 - A test-kit function supplies the current prototype resources.
 
-The refining recipe uses Bedrock's data-driven furnace recipe system. The ingot currently reuses the raw-crystal icon as a temporary placeholder; its own pixel-art texture is still pending.
+The refining recipe uses Bedrock's data-driven furnace recipe system. The ingot has its own original 16×16 pixel-art texture.
 
 The ore generation uses Bedrock's data-driven feature and feature-rule system. Depending on the target Bedrock release, a disposable test world may need the Creation of Custom Biomes experiment enabled. The ore has not yet been confirmed in-game.
 

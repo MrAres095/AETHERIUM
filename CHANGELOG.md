@@ -10,7 +10,7 @@ All notable AETHERIUM project changes are recorded here.
 - Extended static recipe validation to check furnace inputs, outputs, and station tags.
 - Updated both pack manifests to 0.3.3.
 
-**Status:** Repository implementation only. The smelting recipe and temporary icon reuse still require in-game verification; a dedicated ingot texture remains to be made.
+**Status:** Repository implementation only. The smelting recipe and new ingot texture still require in-game verification.
 
 ## 0.3.2 – Larger Aetherium ore veins
 

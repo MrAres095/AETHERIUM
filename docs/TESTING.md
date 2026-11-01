@@ -14,7 +14,7 @@ Ore generation makes 8 placement attempts per chunk. Each feature attempt has a 
 
 The future Lost Realms dimension is planned to have a much richer underground ore distribution, with Aetherium appearing frequently alongside its other ores. That dimension is not implemented yet.
 
-The raw crystal and ore now have distinct original 16×16 pixel-art textures. The ingot temporarily reuses the raw-crystal icon until its own original texture is created. The original crystal and crystal-block textures remain placeholders.
+The raw crystal and ore now have distinct original 16×16 pixel-art textures. The ingot has its own original 16×16 pixel-art texture. The original crystal and crystal-block textures remain placeholders.
 
 ## World-generation requirement
 
