@@ -5,7 +5,7 @@
 Run from the repository root:
 
 ```bash
-python3 tools/validate_pack.py
+python3 -m unittest discover -s tools -p 'test_*.py' -v\npython3 tools/validate_pack.py
 ```
 
 The validator checks:
@@ -19,7 +19,7 @@ The validator checks:
 - Recipe identifiers, shaped-pattern dimensions/key symbols, ingredients, result identifiers, and positive result counts.
 - Registered language files and required item/block localization keys.
 - Loot-table item identifiers against registered item/block identifiers.
-- Block loot-table paths.
+- Item icon and block material texture keys against their atlases.\n- Referenced block loot-table paths.\n\nThe unit tests cover manifest validation and valid/invalid shaped and shapeless recipe cases.
 
 Warnings about identical PNG files are informational; placeholder textures may intentionally share bytes.
 
