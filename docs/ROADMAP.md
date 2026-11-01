@@ -15,6 +15,7 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Add block-to-item and item-to-block recipes
 - [x] Create matching resource pack and original placeholder textures
 - [x] Link the behavior pack to its resource pack dependency
+- [x] Add local static integrity validator and validation instructions
 - [ ] Validate pack import and content in Minecraft Bedrock
 - [ ] Confirm behavior on Android and Windows Bedrock
 - [ ] Define material progression and expand the Core material set
