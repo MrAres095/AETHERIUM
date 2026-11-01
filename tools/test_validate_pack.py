@@ -94,5 +94,53 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("pattern symbol 'X'" in message for message in validator.ERRORS))
 
 
+    def test_worldgen_feature_and_rule_link(self):
+        self.write_json("behavior_pack/features/aetherium_ore_feature.json", {
+            "minecraft:ore_feature": {
+                "description": {"identifier": "aetherium:aetherium_ore_feature"},
+                "count": 5,
+                "replace_rules": [{"places_block": "aetherium:ore", "may_replace": ["minecraft:stone"]}],
+            },
+        })
+        self.write_json("behavior_pack/feature_rules/overworld_aetherium_ore.json", {
+            "minecraft:feature_rules": {
+                "description": {
+                    "identifier": "aetherium:overworld_aetherium_ore",
+                    "places_feature": "aetherium:aetherium_ore_feature",
+                },
+                "conditions": {"minecraft:biome_filter": [{"test": "has_biome_tag", "operator": "==", "value": "overworld"}]},
+                "distribution": {
+                    "iterations": 4,
+                    "x": {"extent": [0, 16]},
+                    "y": {"extent": [-32, 24]},
+                    "z": {"extent": [0, 16]},
+                },
+            },
+        })
+        validator.validate_worldgen({"aetherium:ore"})
+        self.assertEqual(validator.ERRORS, [])
+
+    def test_worldgen_rule_rejects_missing_feature(self):
+        self.write_json("behavior_pack/feature_rules/orphan_rule.json", {
+            "minecraft:feature_rules": {
+                "description": {
+                    "identifier": "aetherium:orphan_rule",
+                    "places_feature": "aetherium:missing_feature",
+                },
+                "conditions": {"minecraft:biome_filter": []},
+                "distribution": {
+                    "iterations": 1,
+                    "x": {"extent": [0, 16]},
+                    "y": {"extent": [-16, 16]},
+                    "z": {"extent": [0, 16]},
+                },
+            },
+        })
+        validator.validate_worldgen({"aetherium:ore"})
+        self.assertTrue(any("does not match a feature file" in message
+                            for message in validator.ERRORS))
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
