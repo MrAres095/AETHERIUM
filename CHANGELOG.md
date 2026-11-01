@@ -2,6 +2,16 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## 0.3.3 – First refining material
+
+- Added the Aetherium Ingot item as the first refined progression material.
+- Added a furnace and blast-furnace recipe converting Raw Aetherium Crystal into one Aetherium Ingot.
+- Added English and Croatian localization and included ingots in the Core test kit.
+- Extended static recipe validation to check furnace inputs, outputs, and station tags.
+- Updated both pack manifests to 0.3.3.
+
+**Status:** Repository implementation only. The smelting recipe and temporary icon reuse still require in-game verification; a dedicated ingot texture remains to be made.
+
 ## 0.3.2 – Larger Aetherium ore veins
 
 - Increased the configured Aetherium ore feature vein size from 5 to 7 blocks.

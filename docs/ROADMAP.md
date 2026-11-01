@@ -29,7 +29,9 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Confirm ore drops and pack behavior on Android and Windows
 - [ ] Confirm compatibility with Bedrock Dedicated Server
 - [ ] Replace placeholder textures with distinct final pixel-art assets
-- [ ] Add a balanced raw-material refining recipe
+- [x] Add the first Raw Aetherium Crystal → Aetherium Ingot furnace/blast-furnace recipe
+- [ ] Test smelting recipe in Bedrock
+- [ ] Create a distinct original Aetherium Ingot texture
 
 ## Milestone 2 – Power prototype
 - [ ] Define energy units and transfer rules

@@ -2,7 +2,7 @@
 
 A modular, original technology-and-adventure add-on for Minecraft Bedrock Edition.
 
-> **Project status:** 0.3.2 development prototype – seven-block Aetherium ore veins; in-game validation pending.  
+> **Project status:** 0.3.3 development prototype – raw-crystal smelting and Aetherium Ingot; in-game validation pending.  
 > **Target platforms:** Minecraft Bedrock on Android and Windows  
 > **Distribution goal:** One integrated add-on package; Marketplace readiness will be evaluated later.
 
@@ -21,10 +21,13 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - `aetherium:crystal_block` – placeable Crystal Block with reversible 9:1 crafting.
 - `aetherium:ore` – underground Overworld ore block.
 - `aetherium:raw_crystal` – raw material dropped by the ore.
+- `aetherium:ingot` – refined in a furnace or blast furnace from Raw Aetherium Crystal.
 - Feature and feature-rule definitions distribute ore in underground Overworld stone/deepslate.
 - Ore placement attempts per chunk: 8; each generated vein has a configured size of up to 7 ore blocks.
 - English and Croatian localization for the current content.
 - A test-kit function supplies the current prototype resources.
+
+The refining recipe uses Bedrock's data-driven furnace recipe system. The ingot currently reuses the raw-crystal icon as a temporary placeholder; its own pixel-art texture is still pending.
 
 The ore generation uses Bedrock's data-driven feature and feature-rule system. Depending on the target Bedrock release, a disposable test world may need the Creation of Custom Biomes experiment enabled. The ore has not yet been confirmed in-game.
 
@@ -58,7 +61,7 @@ The build script validates first, then creates `dist/AETHERIUM-X.Y.Z.mcaddon` co
 
 ## Next milestone
 
-Verify ore generation and drops in Bedrock, then add a balanced refining step that turns raw material into usable Aetherium Crystal. Only after that should the first powered machine be added.
+Verify ore generation and drops in Bedrock, test the new furnace recipe in Bedrock, then design the first powered processing machine. The ingot is the first intermediate metal for machine and portal progression.
 
 ## Testing
 
