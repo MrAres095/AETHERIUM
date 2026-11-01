@@ -2,18 +2,26 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## 0.3.0 – First ore-generation prototype
+
+- Added the original `aetherium:ore` block.
+- Added `aetherium:raw_crystal` as the ore's drop.
+- Added an ore feature and Overworld underground feature rule targeting stone and deepslate.
+- Added English and Croatian names for the ore and raw material.
+- Expanded the test kit with raw crystals and ore blocks.
+- Extended static validation to check feature identifiers, placed blocks, feature-rule references, biome filters, and distribution bounds.
+- Updated the pack manifests and development metadata to 0.3.0.
+
+**Status:** Development prototype. World generation, mining drops, Android/Windows behavior, and BDS compatibility still require in-game testing. Ore/raw material textures remain placeholders.
+
 ## 0.2.0 – Core prototype
 
-- Added the original `aetherium:crystal` item.
-- Added the `aetherium:crystal_block` placeable block and loot table.
+- Added the original `aetherium:crystal` item and `aetherium:crystal_block` placeable block.
 - Added shaped recipes to compress nine crystals into a block and unpack a block into nine crystals.
 - Added the matching resource pack, texture atlases, and English/Croatian display names.
 - Added the behavior-pack dependency on the resource pack.
 - Added a test-kit function for repeatable in-game checks.
-- Added a local static validator for manifests, recipes, localization, texture references, and loot tables.
-- Repaired validator control flow and expanded cross-reference checks for icons, block textures, and loot paths.
-- Added unit tests for manifest and recipe validation.\n- Repaired validator control flow and expanded cross-reference checks for icons, block textures, and loot paths.\n- Added unit tests for manifest and recipe validation.
-- Added a local .mcaddon build script that packages separate .mcpack archives without GitHub Actions.
+- Added a local static validator, unit tests, and a local .mcaddon build script.
 - Expanded build, validation, and Android/Windows/BDS test documentation.
 
 **Status:** Development prototype. Static repository validation and in-game validation are separate; runtime testing remains pending.
