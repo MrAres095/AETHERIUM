@@ -7,9 +7,12 @@ All notable AETHERIUM project changes are recorded here.
 - Added the original `aetherium:crystal` item.
 - Added the `aetherium:crystal_block` placeable block and loot table.
 - Added shaped recipes to compress nine crystals into a block and unpack a block into nine crystals.
-- Added the matching resource pack, texture atlases, and English display name.
+- Added the matching resource pack, texture atlases, and English/Croatian display names.
 - Added the behavior-pack dependency on the resource pack.
-- Added manual import and gameplay test instructions.
+- Added a test-kit function for repeatable in-game checks.
+- Added a local static validator for manifests, recipes, localization, texture references, and loot tables.
+- Added a local .mcaddon build script that packages separate .mcpack archives without GitHub Actions.
+- Expanded build, validation, and Android/Windows/BDS test documentation.
 
 **Status:** Development prototype. Static repository validation and in-game validation are separate; runtime testing remains pending.
 
