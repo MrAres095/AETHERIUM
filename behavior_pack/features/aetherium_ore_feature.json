@@ -4,7 +4,7 @@
     "description": {
       "identifier": "aetherium:aetherium_ore_feature"
     },
-    "count": 5,
+    "count": 7,
     "discard_chance_on_air_exposure": 0.35,
     "replace_rules": [
       {
