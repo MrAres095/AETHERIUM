@@ -2,6 +2,15 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## 0.3.1 – Increased Aetherium ore frequency
+
+- Increased the Overworld feature-rule placement attempts from 4 to 8 per chunk.
+- Kept the vein size at 5 blocks, increasing frequency without increasing individual vein size.
+- Updated both pack manifests and development metadata to 0.3.1.
+- Updated the test notes and roadmap to track the new abundance setting.
+
+**Status:** Development tuning change. The actual visible frequency still needs to be measured in newly generated Bedrock chunks.
+
 ## 0.3.0 – First ore-generation prototype
 
 - Added the original `aetherium:ore` block.
