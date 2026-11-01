@@ -4,20 +4,20 @@
     "name": "AETHERIUM Core",
     "description": "Original materials, building blocks, and shared gameplay foundation for AETHERIUM.",
     "uuid": "8b61bba4-4c20-4d51-9f5e-8bafc76e0a11",
-    "version": [0, 2, 0],
+    "version": [0, 3, 0],
     "min_engine_version": [1, 21, 0]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "dd9a2a81-7e6a-4baf-a2f8-4c2c8ef05c22",
-      "version": [0, 2, 0]
+      "version": [0, 3, 0]
     }
   ],
   "dependencies": [
     {
       "uuid": "e78d3a9c-4c1e-4c9f-9b53-11a0c4c2d801",
-      "version": [0, 2, 0]
+      "version": [0, 3, 0]
     }
   ],
   "metadata": {
