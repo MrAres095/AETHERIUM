@@ -58,82 +58,27 @@ def texture_keys(relative: str) -> set[str]:
     return set(data.get("texture_data", {})) if data else set()
 
 
-def main() -> int:
-    bp = read_json("behavior_pack/manifest.json")
-    rp = read_json("resource_pack/manifest.json")
+def validate_manifest(relative: str, manifest: dict | None) -> None:
+    if not manifest:
+        return
+    if manifest.get("format_version") != 2:
+        error(f"{relative}: expected manifest format_version 2")
+    header = manifest.get("header", {})
+    if not isinstance(header.get("name"), str) or not header.get("name", "").strip():
+        error(f"{relative}: header.name must be a non-empty string")
+    for key in ("version", "min_engine_version"):
+        value = header.get(key)
+        if not isinstance(value, list) or len(value) != 3 or not all(
+                isinstance(part, int) and part >= 0 for part in value):
+            error(f"{relative}: header.{key} must be a three-part non-negative version")
+    modules = manifest.get("modules")
+    if not isinstance(modules, list) or not modules:
+        error(f"{relative}: at least one module is required")
 
-    uuids: dict[str, str] = {}
-    for relative, manifest in (("behavior_pack/manifest.json", bp),
-                               ("resource_pack/manifest.json", rp)):
-        if not manifest:
-            continue
-        entries = [("header", manifest.get("header", {}).get("uuid"))]
-        entries += [(f"module[{i}]", m.get("uuid"))
-                    for i, m in enumerate(manifest.get("modules", []))]
-        for label, value in entries:
-            if not isinstance(value, str) or not re.fullmatch(
-                    r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", value):
-                error(f"{relative}: invalid UUID at {label}")
-            elif value in uuids:
-                error(f"Duplicate UUID {value}: {uuids[value]} and {relative}:{label}")
-            else:
-                uuids[value] = f"{relative}:{label}"
 
-    if bp and rp:
-        dependencies = bp.get("dependencies", [])
-        match = any(d.get("uuid") == rp.get("header", {}).get("uuid")
-                    and d.get("version") == rp.get("header", {}).get("version")
-                    for d in dependencies)
-        if not match:
-            error("Behavior pack dependency does not match the resource-pack header UUID/version")
-
-    items = identifier_ids("behavior_pack/items", "minecraft:item")
-    blocks = identifier_ids("behavior_pack/blocks", "minecraft:block")
-    known = items | blocks
-
-    item_keys = texture_keys("resource_pack/textures/item_texture.json")
-    terrain_keys = texture_keys("resource_pack/textures/terrain_texture.json")
-
-    for path in sorted((ROOT / "behavior_pack/items").glob("*.json")):
-        data = read_json(path.relative_to(ROOT).as_posix())
-        if not data:
-            continue
-        icon = data.get("minecraft:item", {}).get("components", {}).get("minecraft:icon")
-        icon_key = icon if isinstance(icon, str) else icon.get("texture") if isinstance(icon, dict) else None
-        if icon_key and icon_key not in item_keys:
-            error(f"{path.relative_to(ROOT)}: item icon '{icon_key}' is not in item_texture.json")
-
-    for path in sorted((ROOT / "behavior_pack/blocks").glob("*.json")):
-        data = read_json(path.relative_to(ROOT).as_posix())
-        if not data:
-            continue
-        components = data.get("minecraft:block", {}).get("components", {})
-        material = components.get("minecraft:material_instances", {})
-        for face in material.values():
-            key = face.get("texture") if isinstance(face, dict) else None
-            if key and key not in terrain_keys:
-                error(f"{path.relative_to(ROOT)}: block texture '{key}' is not in terrain_texture.json")
-        loot = components.get("minecraft:loot")
-        if isinstance(loot, str) and not (ROOT / "behavior_pack" / loot).is_file():
-            error(f"{path.relative_to(ROOT)}: missing loot table '{loot}'")
-
-    for path in sorted((ROOT / "behavior_pack/recipes").glob("*.json")):
-        data = read_json(path.relative_to(ROOT).as_posix())
-        if not data:
-            continue
-        recipe = next((v for k, v in data.items() if k.startswith("minecraft:recipe_")), {})
-        for ingredient in recipe.get("key", {}).values():
-            item = ingredient.get("item")
-            if item and item not in known:
-                error(f"{path.relative_to(ROOT)}: unknown recipe ingredient '{item}'")
-        for ingredient in recipe.get("ingredients", []):
-            item = ingredient.get("item")
-            if item and item not in known:
-                error(f"{path.relative_to(ROOT)}: unknown recipe ingredient '{item}'")
-        result = recipe.get("result", {})
-        result_id = result.get("item") if isinstance(result, dict) else None
-        if result_id and result_id not in known:
-            error(f"{path.relative_to(ROOT)}: unknown recipe result '{result_id}'")
+def validate_recipes(known: set[str]) -> None:
+    recipe_ids: set[str] = set()
+    validate_recipes(known)
 
     for path in sorted((ROOT / "behavior_pack/loot_tables").rglob("*.json")):
         data = read_json(path.relative_to(ROOT).as_posix())
