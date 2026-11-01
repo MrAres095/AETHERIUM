@@ -9,7 +9,7 @@ The 0.3.0 development prototype contains:
 - English and Croatian names for the new content.
 - A test-kit function that supplies sample items and blocks.
 
-The raw crystal and ore currently reuse early placeholder textures. They are temporary atlas references, not final art.
+The raw crystal and ore now have distinct original 16×16 pixel-art textures. The original crystal and crystal-block textures remain placeholders.
 
 ## World-generation requirement
 
