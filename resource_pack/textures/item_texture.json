@@ -6,7 +6,7 @@
       "textures": "textures/items/aetherium_crystal"
     },
     "aetherium_raw_crystal": {
-      "textures": "textures/items/aetherium_crystal"
+      "textures": "textures/items/aetherium_raw_crystal"
     }
   }
 }
