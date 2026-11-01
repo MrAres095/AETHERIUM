@@ -5,7 +5,9 @@
 Run from the repository root:
 
 ```bash
-python3 -m unittest discover -s tools -p 'test_*.py' -v\npython3 tools/validate_pack.py
+python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 tools/validate_pack.py
+python3 tools/build_mcaddon.py
 ```
 
 The validator checks:
@@ -18,27 +20,26 @@ The validator checks:
 - Referenced texture files and PNG signatures/dimensions.
 - Recipe identifiers, shaped-pattern dimensions/key symbols, ingredients, result identifiers, and positive result counts.
 - Registered language files and required item/block localization keys.
-- Loot-table item identifiers against registered item/block identifiers.
-- Item icon and block material texture keys against their atlases.\n- Referenced block loot-table paths.\n\nThe unit tests cover manifest validation and valid/invalid shaped and shapeless recipe cases.
+- Loot-table item identifiers against registered item/block identifiers and block loot paths.
+- Ore feature identifiers, registered placed blocks, feature-rule links, biome filters, and distribution bounds.
 
-Warnings about identical PNG files are informational; placeholder textures may intentionally share bytes.
+The unit tests cover manifest validation and valid/invalid shaped and shapeless recipe cases.
 
 ## What static validation cannot prove
 
-A passing script does not certify that Minecraft accepts every component or format version. It cannot validate engine schemas, rendering, crafting-table behavior, loot behavior, pack import, dedicated-server loading, or Marketplace compliance.
+A passing script does not certify that Minecraft accepts every component or format version. It cannot validate engine schemas, rendering, crafting-table behavior, loot behavior, pack import, feature-rule execution, dedicated-server loading, or Marketplace compliance.
 
 ## Required runtime test matrix
 
 1. Import both packs into a clean Bedrock profile.
-2. Confirm both packs appear and the behavior pack resolves its resource-pack dependency.
-3. Enable both packs in a new test world with cheats enabled.
-4. Confirm the crystal item name and icon render correctly in English and Croatian.
-5. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
-6. Craft a crystal block from nine crystals.
-7. Place and mine the block; confirm the intended drop.
-8. Craft nine crystals back from one block.
-9. Check the Content Log for errors and warnings.
-10. Repeat on Android and Windows Bedrock.
-11. Load the same world on the target Bedrock Dedicated Server and verify that clients joining from Android and Windows receive the pack and see the same content.
+2. Enable both packs in a disposable new world.
+3. If required by the target Bedrock release, enable the Creation of Custom Biomes experiment.
+4. Generate fresh Overworld chunks and explore underground between Y -32 and Y 24.
+5. Confirm Aetherium Ore appears in stone/deepslate and drops Raw Aetherium Crystal.
+6. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
+7. Confirm English and Croatian names.
+8. Check the Content Log for feature, feature-rule, block, loot, and manifest errors.
+9. Repeat on Android and Windows Bedrock.
+10. Load the same pack on the target Bedrock Dedicated Server and verify that clients see the same content.
 
-Record the exact Bedrock version, platform, test date, and outcome before marking a feature as tested.
+Record the exact Bedrock version, platform, experiment settings, test date, and outcome before marking a feature as tested.
