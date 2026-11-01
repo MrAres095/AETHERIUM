@@ -17,6 +17,8 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Link the behavior pack to its resource pack dependency
 - [x] Add local static integrity validator and validation instructions
 - [x] Add local .mcaddon build script and packaging instructions
+- [x] Add Croatian language strings and register hr_HR
+- [x] Add a Core test-kit function for in-game checks
 - [ ] Validate pack import and content in Minecraft Bedrock
 - [ ] Confirm behavior on Android and Windows Bedrock
 - [ ] Replace placeholder textures with distinct final pixel-art assets
