@@ -278,6 +278,80 @@ def validate_content_references() -> None:
         if isinstance(loot_path, str) and not (ROOT / "behavior_pack" / loot_path).is_file():
             error(f"{relative}: referenced loot table does not exist: {loot_path}")
 
+
+def validate_worldgen(known_blocks: set[str]) -> None:
+    feature_dir = ROOT / "behavior_pack/features"
+    rule_dir = ROOT / "behavior_pack/feature_rules"
+    features: set[str] = set()
+    if not feature_dir.is_dir():
+        warn("No behavior_pack/features directory found")
+    else:
+        for path in sorted(feature_dir.glob("*.json")):
+            relative = path.relative_to(ROOT).as_posix()
+            data = read_json(relative)
+            if not data:
+                continue
+            body = data.get("minecraft:ore_feature")
+            if not isinstance(body, dict):
+                error(f"{relative}: only minecraft:ore_feature is currently supported by the worldgen validator")
+                continue
+            description = body.get("description", {})
+            identifier = description.get("identifier") if isinstance(description, dict) else None
+            if not isinstance(identifier, str) or ":" not in identifier:
+                error(f"{relative}: feature needs a namespaced identifier")
+            else:
+                features.add(identifier)
+                if identifier.split(":", 1)[1] != path.stem:
+                    error(f"{relative}: filename must match the feature identifier after its namespace")
+            count = body.get("count")
+            if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+                error(f"{relative}: ore feature count must be a positive integer")
+            rules = body.get("replace_rules")
+            if not isinstance(rules, list) or not rules:
+                error(f"{relative}: ore feature needs at least one replace rule")
+            else:
+                for rule in rules:
+                    block = rule.get("places_block") if isinstance(rule, dict) else None
+                    if block not in known_blocks:
+                        error(f"{relative}: places_block '{block}' is not a registered AETHERIUM block")
+    if not rule_dir.is_dir():
+        warn("No behavior_pack/feature_rules directory found")
+        return
+    for path in sorted(rule_dir.glob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
+        if not data:
+            continue
+        body = data.get("minecraft:feature_rules")
+        if not isinstance(body, dict):
+            error(f"{relative}: missing minecraft:feature_rules object")
+            continue
+        description = body.get("description", {})
+        places = description.get("places_feature") if isinstance(description, dict) else None
+        identifier = description.get("identifier") if isinstance(description, dict) else None
+        if places not in features:
+            error(f"{relative}: places_feature '{places}' does not match a feature file")
+        if not isinstance(identifier, str) or ":" not in identifier:
+            error(f"{relative}: feature rule needs a namespaced identifier")
+        conditions = body.get("conditions")
+        if not isinstance(conditions, dict) or not isinstance(conditions.get("minecraft:biome_filter"), list):
+            error(f"{relative}: feature rule needs a biome filter")
+        distribution = body.get("distribution")
+        if not isinstance(distribution, dict):
+            error(f"{relative}: feature rule needs a distribution object")
+        else:
+            iterations = distribution.get("iterations")
+            if not isinstance(iterations, int) or isinstance(iterations, bool) or iterations < 1:
+                error(f"{relative}: distribution.iterations must be a positive integer")
+            for axis in ("x", "y", "z"):
+                axis_data = distribution.get(axis, {})
+                extent = axis_data.get("extent") if isinstance(axis_data, dict) else None
+                if not isinstance(extent, list) or len(extent) != 2 or not all(
+                    isinstance(value, int) and not isinstance(value, bool) for value in extent
+                ) or extent[0] > extent[1]:
+                    error(f"{relative}: distribution.{axis}.extent must be two ordered integer bounds")
+
+
 def validate_localization() -> None:
     relative = "resource_pack/texts/languages.json"
     languages = ROOT / relative
@@ -292,7 +366,7 @@ def validate_localization() -> None:
     if not isinstance(codes, list) or not codes:
         error(f"{relative}: expected a non-empty array of language codes")
         return
-    required = {"item.aetherium:crystal.name", "tile.aetherium:crystal_block.name"}
+    required = {"item.aetherium:crystal.name", "item.aetherium:raw_crystal.name", "tile.aetherium:crystal_block.name", "tile.aetherium:ore.name"}
     for code in codes:
         if not isinstance(code, str) or not re.fullmatch(r"[a-z]{2}_[A-Z]{2}", code):
             error(f"{relative}: invalid language code '{code}'")
@@ -343,6 +417,7 @@ def main() -> int:
     validate_loot_tables(known)
     validate_textures()
     validate_content_references()
+    validate_worldgen(blocks)
     validate_localization()
 
     for message in WARNINGS:
