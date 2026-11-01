@@ -1,6 +1,6 @@
 # AETHERIUM roadmap
 
-Status key: `planned`, `in progress`, `implemented`, `tested`.
+Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means files are present; tested means confirmed in the actual Bedrock game.
 
 ## Milestone 0 – Project foundation
 - [x] Repository structure and project overview
@@ -10,11 +10,14 @@ Status key: `planned`, `in progress`, `implemented`, `tested`.
 - [ ] Import and run the smoke test in Minecraft Bedrock
 
 ## Milestone 1 – Core content prototype
-- [ ] Confirm supported Bedrock version and target API baseline
-- [ ] Add original Aetherium material item
-- [ ] Add original Aetherium test block
-- [ ] Add recipes and creative inventory grouping
-- [ ] Validate on Android and Windows Bedrock
+- [x] Add original Aetherium Crystal item
+- [x] Add original Aetherium Crystal Block
+- [x] Add block-to-item and item-to-block recipes
+- [x] Create matching resource pack and original placeholder textures
+- [x] Link the behavior pack to its resource pack dependency
+- [ ] Validate pack import and content in Minecraft Bedrock
+- [ ] Confirm behavior on Android and Windows Bedrock
+- [ ] Define material progression and expand the Core material set
 
 ## Milestone 2 – Power prototype
 - [ ] Define energy units and transfer rules
