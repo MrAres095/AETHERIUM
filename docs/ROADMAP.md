@@ -22,9 +22,10 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Add Aetherium Ore block and raw-crystal loot table
 - [x] Add an Overworld ore feature and feature rule
 - [x] Increase ore placement attempts from 4 to 8 per chunk
+- [x] Increase configured Aetherium vein size from 5 to 7
 - [x] Add English/Croatian names for ore progression
 - [x] Add static checks for feature and feature-rule references
-- [ ] Verify ore generation and the increased frequency in a new Bedrock world
+- [ ] Verify ore generation, vein size, and frequency in a new Bedrock world
 - [ ] Confirm ore drops and pack behavior on Android and Windows
 - [ ] Confirm compatibility with Bedrock Dedicated Server
 - [ ] Replace placeholder textures with distinct final pixel-art assets
@@ -43,7 +44,7 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Automation
 - [ ] Reactors
 - [ ] Nature
-- [ ] The Lost Realms
+- [ ] The Lost Realms: create an original dimension with a deliberately ore-rich underground; Aetherium should be abundant alongside the dimension's other ores.
 - [ ] Guidebook and integrated release package
 
 Milestones will be adjusted as Bedrock API constraints are tested. Planned features are not implemented features.
