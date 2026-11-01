@@ -21,7 +21,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - aetherium:crystal_block – a placeable full block with its own texture.
 - Crafting: 9 crystals create 1 crystal block; 1 crystal block returns 9 crystals.
 - Behavior pack automatically declares its matching resource-pack dependency.
-- The current textures are original geometric placeholders and will be refined during art direction.
+- The current textures are early placeholders and will be refined during art direction.
 
 These assets are an early prototype, not a final balanced progression system. Import and in-game behavior still need confirmation on Bedrock.
 
@@ -44,15 +44,22 @@ The modules above are planned features, not implemented functionality yet.
 - behavior_pack/ – gameplay data and later Bedrock scripting code.
 - resource_pack/ – original textures, models, sounds, and UI assets.
 - docs/ – architecture, compatibility, testing, and design notes.
-- tools/ – local validation helpers.
+- tools/ – local validation and packaging helpers.
 
-## Static validation
+## Validate and build
 
-Run `python3 tools/validate_pack.py` from the repository root to check JSON syntax, pack UUID/dependency consistency, texture references, recipes, and loot-table references. This is a repository-integrity check only; it does not replace Bedrock runtime testing. See [docs/VALIDATION.md](docs/VALIDATION.md).
+Run these commands from the repository root:
+
+```sh
+python3 tools/validate_pack.py
+python3 tools/build_mcaddon.py
+```
+
+The build script validates first, then creates `dist/AETHERIUM-X.Y.Z.mcaddon` containing separate behavior and resource packs. It checks archive integrity, but cannot replace importing and testing the add-on in Minecraft. See [docs/VALIDATION.md](docs/VALIDATION.md) and [docs/BUILDING.md](docs/BUILDING.md).
 
 ## Next milestone
 
-Validate the Core prototype in a clean Bedrock test world, then expand the material set and establish a consistent visual style before starting the first power-generation machine.
+Validate the Core prototype in a clean Bedrock test world, then refine the original textures and establish a consistent visual style before starting the first power-generation machine.
 
 ## Testing
 
