@@ -33,6 +33,10 @@ The ore generation uses Bedrock's data-driven feature and feature-rule system. D
 
 The ore and raw-crystal now have separate original 16×16 pixel-art textures. The original crystal item and crystal block still use early placeholder textures that will be refined.
 
+## Planned Industry processing
+
+The first planned machine is the Grinder. Its agreed Aetherium Ore recipe is 1 ore block → 2 Raw Aetherium Crystals (2× yield). The Grinder is not implemented yet; direct mining drops remain unchanged until its container and Script API processing have been tested in Bedrock. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
+
 ## Planned modules
 
 1. **Aetherium Core** – shared registries, progression hooks, configuration, and common utilities.

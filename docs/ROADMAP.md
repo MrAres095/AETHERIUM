@@ -33,7 +33,13 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Test smelting recipe in Bedrock
 - [ ] Create a distinct original Aetherium Ingot texture
 
-## Milestone 2 – Power prototype
+## Milestone 2 – Industry processing prototype
+- [x] Define Grinder yield: 1 Aetherium Ore → 2 Raw Aetherium Crystals (2×)
+- [ ] Add Grinder block, inventory/container, and original textures
+- [ ] Implement safe input/output processing with no item loss or duplication
+- [ ] Test Grinder on Android, Windows, and Bedrock Dedicated Server
+
+## Milestone 3 – Power prototype
 - [ ] Define energy units and transfer rules
 - [ ] Prototype one generator
 - [ ] Prototype one energy storage block
