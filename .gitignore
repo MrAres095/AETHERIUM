@@ -1,0 +1,14 @@
+# Generated packages
+*.mcpack
+*.mcaddon
+*.zip
+
+# Local editor / operating-system files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary build output
+build/
+dist/
