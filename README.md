@@ -2,7 +2,7 @@
 
 A modular, original technology-and-adventure add-on for Minecraft Bedrock Edition.
 
-> **Project status:** Core prototype 0.2.0 – first custom material, block, recipes, and original placeholder textures added; in-game validation pending.  
+> **Project status:** 0.3.0 development prototype – first Overworld ore-generation slice added; in-game validation pending.  
 > **Target platforms:** Minecraft Bedrock on Android and Windows  
 > **Distribution goal:** One integrated add-on package; Marketplace readiness will be evaluated later.
 
@@ -17,13 +17,17 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 
 ## Current Core prototype
 
-- aetherium:crystal – an original glowing crystal material item.
-- aetherium:crystal_block – a placeable full block with its own texture.
-- Crafting: 9 crystals create 1 crystal block; 1 crystal block returns 9 crystals.
-- Behavior pack automatically declares its matching resource-pack dependency.
-- The current textures are early placeholders and will be refined during art direction.
+- `aetherium:crystal` – Aetherium Crystal material item.
+- `aetherium:crystal_block` – placeable Crystal Block with reversible 9:1 crafting.
+- `aetherium:ore` – underground Overworld ore block.
+- `aetherium:raw_crystal` – raw material dropped by the ore.
+- Feature and feature-rule definitions distribute ore in underground Overworld stone/deepslate.
+- English and Croatian localization for the current content.
+- A test-kit function supplies the current prototype resources.
 
-These assets are an early prototype, not a final balanced progression system. Import and in-game behavior still need confirmation on Bedrock.
+The ore generation uses Bedrock's data-driven feature and feature-rule system. Depending on the target Bedrock release, a disposable test world may need the Creation of Custom Biomes experiment enabled. The ore has not yet been confirmed in-game.
+
+The ore and raw-crystal textures currently reuse early placeholder art. They are temporary and will be replaced with distinct original pixel-art assets.
 
 ## Planned modules
 
@@ -39,13 +43,6 @@ These assets are an early prototype, not a final balanced progression system. Im
 
 The modules above are planned features, not implemented functionality yet.
 
-## Repository layout
-
-- behavior_pack/ – gameplay data and later Bedrock scripting code.
-- resource_pack/ – original textures, models, sounds, and UI assets.
-- docs/ – architecture, compatibility, testing, and design notes.
-- tools/ – local validation and packaging helpers.
-
 ## Validate and build
 
 Run these commands from the repository root:
@@ -56,11 +53,11 @@ python3 tools/validate_pack.py
 python3 tools/build_mcaddon.py
 ```
 
-The build script validates first, then creates `dist/AETHERIUM-X.Y.Z.mcaddon` containing separate behavior and resource packs. It checks archive integrity, but cannot replace importing and testing the add-on in Minecraft. See [docs/VALIDATION.md](docs/VALIDATION.md) and [docs/BUILDING.md](docs/BUILDING.md).
+The build script validates first, then creates `dist/AETHERIUM-X.Y.Z.mcaddon` containing separate behavior and resource packs. It checks archive integrity, but cannot replace importing and testing the add-on in Minecraft. See [docs/VALIDATION.md](docs/VALIDATION.md), [docs/BUILDING.md](docs/BUILDING.md), and [docs/TESTING.md](docs/TESTING.md).
 
 ## Next milestone
 
-Validate the Core prototype in a clean Bedrock test world, then refine the original textures and establish a consistent visual style before starting the first power-generation machine.
+Verify ore generation and drops in Bedrock, then add a balanced refining step that turns raw material into usable Aetherium Crystal. Only after that should the first powered machine be added.
 
 ## Testing
 
