@@ -27,7 +27,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 
 The ore generation uses Bedrock's data-driven feature and feature-rule system. Depending on the target Bedrock release, a disposable test world may need the Creation of Custom Biomes experiment enabled. The ore has not yet been confirmed in-game.
 
-The ore and raw-crystal textures currently reuse early placeholder art. They are temporary and will be replaced with distinct original pixel-art assets.
+The ore and raw-crystal now have separate original 16×16 pixel-art textures. The original crystal item and crystal block still use early placeholder textures that will be refined.
 
 ## Planned modules
 
