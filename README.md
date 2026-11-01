@@ -2,7 +2,7 @@
 
 A modular, original technology-and-adventure add-on for Minecraft Bedrock Edition.
 
-> **Project status:** 0.3.0 development prototype – first Overworld ore-generation slice added; in-game validation pending.  
+> **Project status:** 0.3.1 development prototype – increased Aetherium ore generation attempts; in-game validation pending.  
 > **Target platforms:** Minecraft Bedrock on Android and Windows  
 > **Distribution goal:** One integrated add-on package; Marketplace readiness will be evaluated later.
 
@@ -22,6 +22,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - `aetherium:ore` – underground Overworld ore block.
 - `aetherium:raw_crystal` – raw material dropped by the ore.
 - Feature and feature-rule definitions distribute ore in underground Overworld stone/deepslate.
+- Ore placement attempts per chunk increased from 4 to 8 (twice the previous attempt count); vein size remains 5.
 - English and Croatian localization for the current content.
 - A test-kit function supplies the current prototype resources.
 
