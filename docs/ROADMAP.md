@@ -21,9 +21,10 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Add Raw Aetherium Crystal item
 - [x] Add Aetherium Ore block and raw-crystal loot table
 - [x] Add an Overworld ore feature and feature rule
+- [x] Increase ore placement attempts from 4 to 8 per chunk
 - [x] Add English/Croatian names for ore progression
 - [x] Add static checks for feature and feature-rule references
-- [ ] Verify ore generation in a new Bedrock world
+- [ ] Verify ore generation and the increased frequency in a new Bedrock world
 - [ ] Confirm ore drops and pack behavior on Android and Windows
 - [ ] Confirm compatibility with Bedrock Dedicated Server
 - [ ] Replace placeholder textures with distinct final pixel-art assets
