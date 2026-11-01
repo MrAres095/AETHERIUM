@@ -15,7 +15,7 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Add block-to-item and item-to-block recipes
 - [x] Create matching resource pack and original placeholder textures
 - [x] Link the behavior pack to its resource pack dependency
-- [x] Add local static integrity validator and validation instructions
+- [x] Add local static integrity validator and validation instructions\n- [x] Add unit tests for manifest and recipe validation
 - [x] Add local .mcaddon build script and packaging instructions
 - [x] Add Croatian language strings and register hr_HR
 - [x] Add a Core test-kit function for in-game checks
