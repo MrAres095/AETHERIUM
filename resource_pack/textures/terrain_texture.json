@@ -8,7 +8,7 @@
       "textures": "textures/blocks/aetherium_crystal_block"
     },
     "aetherium_ore": {
-      "textures": "textures/blocks/aetherium_crystal_block"
+      "textures": "textures/blocks/aetherium_ore"
     }
   }
 }
