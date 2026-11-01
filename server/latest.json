@@ -1,9 +1,9 @@
 {
   "project": "AETHERIUM",
   "channel": "development",
-  "latest_version": "0.3.2",
-  "package": "AETHERIUM-0.3.2.mcaddon",
+  "latest_version": "0.3.3",
+  "package": "AETHERIUM-0.3.3.mcaddon",
   "status": "development",
   "tested_in_game": false,
-  "notes": "Development build with seven-block Aetherium ore veins. The Lost Realms ore-rich dimension is planned; no verified package is published yet."
+  "notes": "Development build adds Aetherium Ingot smelting from Raw Aetherium Crystal. Ore generation and smelting still require in-game testing; The Lost Realms remains planned."
 }
