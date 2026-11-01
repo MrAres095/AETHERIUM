@@ -162,7 +162,7 @@ def main() -> int:
                     error(f"{atlas}: missing texture file {image_path.relative_to(ROOT)}")
                 else:
                     header = image_path.read_bytes()[:24]
-                    if len(header) != 24 or header[:8] != b"\\x89PNG\\r\\n\\x1a\\n":
+                    if len(header) != 24 or header[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
                         error(f"{image_path.relative_to(ROOT)}: not a valid PNG header")
                     else:
                         width, height = struct.unpack(">II", header[16:24])
