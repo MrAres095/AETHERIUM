@@ -1,0 +1,23 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "aetherium:crystal_block"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "CCC",
+      "CCC",
+      "CCC"
+    ],
+    "key": {
+      "C": {
+        "item": "aetherium:crystal"
+      }
+    },
+    "result": {
+      "item": "aetherium:crystal_block",
+      "count": 1
+    }
+  }
+}

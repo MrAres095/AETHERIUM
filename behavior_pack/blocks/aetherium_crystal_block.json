@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:block": {
+    "description": {
+      "identifier": "aetherium:crystal_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "aetherium_crystal_block",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:loot": "loot_tables/blocks/aetherium_crystal_block.json",
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 3.0
+      },
+      "minecraft:map_color": "#20B8B8"
+    }
+  }
+}

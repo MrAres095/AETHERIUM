@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "AETHERIUM Resources",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "aetherium_crystal": {
+      "textures": "textures/items/aetherium_crystal"
+    }
+  }
+}

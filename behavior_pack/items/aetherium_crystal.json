@@ -1,0 +1,19 @@
+{
+  "format_version": "1.20.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aetherium:crystal",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "aetherium_crystal",
+      "minecraft:max_stack_size": 64,
+      "minecraft:glint": true,
+      "minecraft:display_name": {
+        "value": "item.aetherium:crystal.name"
+      }
+    }
+  }
+}

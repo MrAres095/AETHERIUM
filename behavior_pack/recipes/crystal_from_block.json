@@ -1,0 +1,18 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "aetherium:crystal_from_block"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      {
+        "item": "aetherium:crystal_block"
+      }
+    ],
+    "result": {
+      "item": "aetherium:crystal",
+      "count": 9
+    }
+  }
+}

@@ -2,16 +2,16 @@
   "format_version": 2,
   "header": {
     "name": "AETHERIUM Core",
-    "description": "The foundation behavior pack for AETHERIUM – Complete Technology Pack.",
+    "description": "Original materials, building blocks, and shared gameplay foundation for AETHERIUM.",
     "uuid": "8b61bba4-4c20-4d51-9f5e-8bafc76e0a11",
-    "version": [0, 1, 0],
+    "version": [0, 2, 0],
     "min_engine_version": [1, 21, 0]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "dd9a2a81-7e6a-4baf-a2f8-4c2c8ef05c22",
-      "version": [0, 1, 0]
+      "version": [0, 2, 0]
     }
   ],
   "metadata": {
