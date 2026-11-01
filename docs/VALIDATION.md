@@ -12,10 +12,13 @@ The validator checks:
 
 - JSON syntax in pack manifests, items, blocks, recipes, loot tables, and texture atlases.
 - UUID format and uniqueness across both manifests.
+- Manifest format, required header fields, three-part versions, and module presence.
 - The behavior-pack dependency against the resource-pack header UUID and version.
 - Item icon and block material texture keys against their atlases.
 - Referenced texture files and PNG signatures/dimensions.
-- Recipe ingredients/results and loot-table item identifiers against registered item/block identifiers.
+- Recipe identifiers, shaped-pattern dimensions/key symbols, ingredients, result identifiers, and positive result counts.
+- Registered language files and required item/block localization keys.
+- Loot-table item identifiers against registered item/block identifiers.
 - Block loot-table paths.
 
 Warnings about identical PNG files are informational; placeholder textures may intentionally share bytes.
@@ -29,12 +32,13 @@ A passing script does not certify that Minecraft accepts every component or form
 1. Import both packs into a clean Bedrock profile.
 2. Confirm both packs appear and the behavior pack resolves its resource-pack dependency.
 3. Enable both packs in a new test world with cheats enabled.
-4. Confirm the crystal item name and icon render correctly.
-5. Craft a crystal block from nine crystals.
-6. Place and mine the block; confirm the intended drop.
-7. Craft nine crystals back from one block.
-8. Check the Content Log for errors and warnings.
-9. Repeat on Android and Windows Bedrock.
-10. Load the same world on the target Bedrock Dedicated Server and verify that clients joining from Android and Windows receive the pack and see the same content.
+4. Confirm the crystal item name and icon render correctly in English and Croatian.
+5. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
+6. Craft a crystal block from nine crystals.
+7. Place and mine the block; confirm the intended drop.
+8. Craft nine crystals back from one block.
+9. Check the Content Log for errors and warnings.
+10. Repeat on Android and Windows Bedrock.
+11. Load the same world on the target Bedrock Dedicated Server and verify that clients joining from Android and Windows receive the pack and see the same content.
 
 Record the exact Bedrock version, platform, test date, and outcome before marking a feature as tested.
