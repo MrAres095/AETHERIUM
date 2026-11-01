@@ -46,6 +46,10 @@ The modules above are planned features, not implemented functionality yet.
 - docs/ – architecture, compatibility, testing, and design notes.
 - tools/ – local validation helpers.
 
+## Static validation
+
+Run `python3 tools/validate_pack.py` from the repository root to check JSON syntax, pack UUID/dependency consistency, texture references, recipes, and loot-table references. This is a repository-integrity check only; it does not replace Bedrock runtime testing. See [docs/VALIDATION.md](docs/VALIDATION.md).
+
 ## Next milestone
 
 Validate the Core prototype in a clean Bedrock test world, then expand the material set and establish a consistent visual style before starting the first power-generation machine.
