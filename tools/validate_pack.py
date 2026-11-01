@@ -127,7 +127,7 @@ def validate_recipes(known_items: set[str]) -> None:
         data = read_json(relative)
         if not data:
             continue
-        recipe_types = [key for key in ("minecraft:recipe_shaped", "minecraft:recipe_shapeless") if key in data]
+        recipe_types = [key for key in ("minecraft:recipe_shaped", "minecraft:recipe_shapeless", "minecraft:recipe_furnace") if key in data]
         if len(recipe_types) != 1:
             error(f"{relative}: expected exactly one supported recipe definition")
             continue
@@ -143,6 +143,18 @@ def validate_recipes(known_items: set[str]) -> None:
             error(f"{relative}: duplicate recipe identifier {identifier}")
         else:
             recipe_ids.add(identifier)
+        if recipe_types[0] == "minecraft:recipe_furnace":
+            input_item = recipe.get("input")
+            output_item = recipe.get("output")
+            if input_item not in known_items:
+                error(f"{relative}: unknown furnace input '{input_item}'")
+            if output_item not in known_items:
+                error(f"{relative}: unknown furnace output '{output_item}'")
+            tags = recipe.get("tags")
+            if not isinstance(tags, list) or not tags or not all(isinstance(tag, str) for tag in tags):
+                error(f"{relative}: furnace recipe needs a non-empty tags list")
+            continue
+
         result = recipe.get("result", {})
         result_item = result.get("item") if isinstance(result, dict) else None
         count = result.get("count", 1) if isinstance(result, dict) else 0
@@ -366,7 +378,7 @@ def validate_localization() -> None:
     if not isinstance(codes, list) or not codes:
         error(f"{relative}: expected a non-empty array of language codes")
         return
-    required = {"item.aetherium:crystal.name", "item.aetherium:raw_crystal.name", "tile.aetherium:crystal_block.name", "tile.aetherium:ore.name"}
+    required = {"item.aetherium:crystal.name", "item.aetherium:raw_crystal.name", "item.aetherium:ingot.name", "tile.aetherium:crystal_block.name", "tile.aetherium:ore.name"}
     for code in codes:
         if not isinstance(code, str) or not re.fullmatch(r"[a-z]{2}_[A-Z]{2}", code):
             error(f"{relative}: invalid language code '{code}'")

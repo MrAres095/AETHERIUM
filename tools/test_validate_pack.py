@@ -94,6 +94,31 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("pattern symbol 'X'" in message for message in validator.ERRORS))
 
 
+    def test_valid_furnace_recipe_passes(self):
+        self.write_json("behavior_pack/recipes/refine.json", {
+            "format_version": "1.17.41",
+            "minecraft:recipe_furnace": {
+                "description": {"identifier": "aetherium:refine"},
+                "tags": ["furnace", "blast_furnace"],
+                "input": "aetherium:raw_crystal",
+                "output": "aetherium:ingot",
+            },
+        })
+        validator.validate_recipes({"aetherium:raw_crystal", "aetherium:ingot"})
+        self.assertEqual(validator.ERRORS, [])
+
+    def test_furnace_recipe_rejects_unknown_output(self):
+        self.write_json("behavior_pack/recipes/refine.json", {
+            "minecraft:recipe_furnace": {
+                "description": {"identifier": "aetherium:refine"},
+                "tags": ["furnace"],
+                "input": "aetherium:raw_crystal",
+                "output": "aetherium:missing_ingot",
+            },
+        })
+        validator.validate_recipes({"aetherium:raw_crystal"})
+        self.assertTrue(any("unknown furnace output" in message for message in validator.ERRORS))
+
     def test_worldgen_feature_and_rule_link(self):
         self.write_json("behavior_pack/features/aetherium_ore_feature.json", {
             "minecraft:ore_feature": {
