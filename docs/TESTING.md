@@ -2,12 +2,14 @@
 
 ## Current prototype contents
 
-The 0.3.0 development prototype contains:
+The 0.3.1 development prototype contains:
 - Aetherium Crystal and Aetherium Crystal Block from the initial Core prototype.
 - Aetherium Ore, which is intended to generate in underground Overworld stone/deepslate.
 - Raw Aetherium Crystal dropped by the ore.
 - English and Croatian names for the new content.
 - A test-kit function that supplies sample items and blocks.
+
+Ore generation now makes 8 placement attempts per chunk instead of 4. The vein size remains 5, so the configured attempt frequency is doubled without enlarging each vein. Actual visible abundance must still be checked in-game.
 
 The raw crystal and ore now have distinct original 16×16 pixel-art textures. The original crystal and crystal-block textures remain placeholders.
 
@@ -23,7 +25,7 @@ The current custom feature/feature-rule approach may require the **Creation of C
 4. If ore world generation does not activate, enable the required world-generation experiment in that disposable world and create fresh chunks.
 5. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
 6. Confirm the test kit includes Aetherium Crystal, Raw Aetherium Crystal, Aetherium Ore, and Aetherium Crystal Block.
-7. Locate Aetherium Ore in newly generated underground Overworld terrain, including stone and deepslate areas.
+7. Locate Aetherium Ore in newly generated underground Overworld terrain, including stone and deepslate areas. Record how often it appears during a fixed exploration route.
 8. Mine the ore and confirm it drops Raw Aetherium Crystal.
 9. Check the Creative inventory names in English and Croatian.
 10. Check the Content Log for feature, feature-rule, block, loot-table, texture, and manifest errors.
@@ -34,6 +36,7 @@ The current custom feature/feature-rule approach may require the **Creation of C
 - The test-kit function gives all four test resources.
 - The ore feature and feature rule load without Content Log errors.
 - New chunks in the target height range can generate the ore in the Overworld.
+- Ore is more common than in the previous 4-attempt configuration without overwhelming normal mining.
 - Mining the ore drops the raw crystal.
 - English and Croatian names resolve correctly.
 
@@ -47,4 +50,4 @@ The current custom feature/feature-rule approach may require the **Creation of C
 - Test the same pack on the target Bedrock Dedicated Server.
 - Record the exact Minecraft version, platform, experiment settings, and test result.
 
-Repository-side checks do not replace testing in the actual Bedrock engine. The current 0.3.0 prototype has not yet been confirmed inside Minecraft.
+Repository-side checks do not replace testing in the actual Bedrock engine. The current 0.3.1 prototype has not yet been confirmed inside Minecraft.
