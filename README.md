@@ -51,6 +51,7 @@ The modules above are planned features, not implemented functionality yet.
 Run these commands from the repository root:
 
 ```sh
+python3 -m unittest discover -s tools -p 'test_*.py' -v
 python3 tools/validate_pack.py
 python3 tools/build_mcaddon.py
 ```
