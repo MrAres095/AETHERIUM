@@ -14,6 +14,12 @@
       "version": [0, 2, 0]
     }
   ],
+  "dependencies": [
+    {
+      "uuid": "e78d3a9c-4c1e-4c9f-9b53-11a0c4c2d801",
+      "version": [0, 2, 0]
+    }
+  ],
   "metadata": {
     "authors": ["AETHERIUM Project"],
     "license": "Proprietary"
