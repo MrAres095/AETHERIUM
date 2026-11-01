@@ -2,6 +2,15 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## 0.3.2 – Larger Aetherium ore veins
+
+- Increased the configured Aetherium ore feature vein size from 5 to 7 blocks.
+- Kept the Overworld placement frequency at 8 attempts per chunk.
+- Updated both pack manifests and development metadata to 0.3.2.
+- Recorded the design requirement for The Lost Realms: a much richer underground ore distribution, with Aetherium frequently found alongside other dimension ores.
+
+**Status:** Development tuning change. The configured vein size and actual ore abundance still need to be measured in newly generated Bedrock chunks. The Lost Realms dimension remains planned, not implemented.
+
 ## 0.3.1 – Increased Aetherium ore frequency
 
 - Increased the Overworld feature-rule placement attempts from 4 to 8 per chunk.
