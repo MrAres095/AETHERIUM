@@ -1,9 +1,9 @@
 {
   "project": "AETHERIUM",
   "channel": "development",
-  "latest_version": "0.3.1",
-  "package": "AETHERIUM-0.3.1.mcaddon",
+  "latest_version": "0.3.2",
+  "package": "AETHERIUM-0.3.2.mcaddon",
   "status": "development",
   "tested_in_game": false,
-  "notes": "Development build with increased Aetherium ore generation attempts. No verified package is published yet."
+  "notes": "Development build with seven-block Aetherium ore veins. The Lost Realms ore-rich dimension is planned; no verified package is published yet."
 }
