@@ -16,7 +16,7 @@ From the repository root:
 python3 tools/build_mcaddon.py
 ```
 
-The script first runs `tools/validate_pack.py`. If static validation fails,
+Run the unit tests and static validator before building. The build script also runs `tools/validate_pack.py` automatically. If static validation fails,
 packaging stops. On success it creates:
 
 ```text
