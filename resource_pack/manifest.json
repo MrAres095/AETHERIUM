@@ -4,14 +4,14 @@
     "name": "AETHERIUM Resources",
     "description": "Original AETHERIUM textures and language resources.",
     "uuid": "e78d3a9c-4c1e-4c9f-9b53-11a0c4c2d801",
-    "version": [0, 3, 1],
+    "version": [0, 3, 2],
     "min_engine_version": [1, 21, 0]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "ac31f70b-9e51-43e8-9a42-2c4c8a9d7202",
-      "version": [0, 3, 1]
+      "version": [0, 3, 2]
     }
   ],
   "metadata": {
