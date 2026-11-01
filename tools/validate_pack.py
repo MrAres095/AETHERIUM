@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Static integrity checks for the AETHERIUM Bedrock packs.
 
-This validates repository references and JSON syntax. It does NOT replace
-Minecraft Bedrock's content-log or in-game validation.
+This checks repository structure and cross-references. It does not replace
+Bedrock engine validation, content-log review, or in-game testing.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import struct
@@ -31,99 +32,283 @@ def read_json(relative: str):
         error(f"Missing JSON file: {relative}")
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         error(f"Invalid JSON in {relative}: {exc}")
         return None
+    if not isinstance(data, dict):
+        error(f"{relative}: expected a JSON object")
+        return None
+    return data
 
 
-def identifier_ids(folder: str, root_key: str) -> set[str]:
+def validate_manifest(relative: str, manifest: dict | None) -> set[str]:
+    uuids: set[str] = set()
+    if not manifest:
+        return uuids
+    if manifest.get("format_version") != 2:
+        error(f"{relative}: expected manifest format_version 2")
+    header = manifest.get("header")
+    if not isinstance(header, dict):
+        error(f"{relative}: header must be an object")
+        return uuids
+    if not isinstance(header.get("name"), str) or not header.get("name", "").strip():
+        error(f"{relative}: header.name must be a non-empty string")
+    for key in ("uuid",):
+        value = header.get(key)
+        if not isinstance(value, str) or not re.fullmatch(
+            r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", value
+        ):
+            error(f"{relative}: header.{key} must be a UUID")
+        else:
+            uuids.add(value.lower())
+    for key in ("version", "min_engine_version"):
+        value = header.get(key)
+        if not isinstance(value, list) or len(value) != 3 or not all(
+            isinstance(part, int) and not isinstance(part, bool) and part >= 0 for part in value
+        ):
+            error(f"{relative}: header.{key} must be a three-part non-negative version")
+    modules = manifest.get("modules")
+    if not isinstance(modules, list) or not modules:
+        error(f"{relative}: at least one module is required")
+    else:
+        for index, module in enumerate(modules):
+            if not isinstance(module, dict):
+                error(f"{relative}: modules[{index}] must be an object")
+                continue
+            module_uuid = module.get("uuid")
+            if not isinstance(module_uuid, str) or not re.fullmatch(
+                r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", module_uuid
+            ):
+                error(f"{relative}: modules[{index}].uuid must be a UUID")
+            elif module_uuid.lower() in uuids:
+                error(f"{relative}: duplicate UUID {module_uuid}")
+            else:
+                uuids.add(module_uuid.lower())
+            version = module.get("version")
+            if not isinstance(version, list) or len(version) != 3 or not all(
+                isinstance(part, int) and not isinstance(part, bool) and part >= 0 for part in version
+            ):
+                error(f"{relative}: modules[{index}].version must be a three-part version")
+    return uuids
+
+
+def identifiers(folder: str, component: str) -> set[str]:
     found: set[str] = set()
-    for path in sorted((ROOT / folder).glob("*.json")):
-        data = read_json(path.relative_to(ROOT).as_posix())
+    base = ROOT / folder
+    if not base.is_dir():
+        error(f"Missing directory: {folder}")
+        return found
+    for path in sorted(base.glob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
         if not data:
             continue
-        identifier = data.get(root_key, {}).get("description", {}).get("identifier")
-        if not isinstance(identifier, str) or ":" not in identifier:
-            error(f"{path.relative_to(ROOT)}: missing namespaced identifier")
+        body = data.get(component, {})
+        description = body.get("description", {}) if isinstance(body, dict) else {}
+        identifier = description.get("identifier") if isinstance(description, dict) else None
+        if not isinstance(identifier, str) or not re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+", identifier):
+            error(f"{relative}: missing or invalid namespaced identifier")
         elif identifier in found:
-            error(f"Duplicate identifier: {identifier}")
+            error(f"{relative}: duplicate identifier {identifier}")
         else:
             found.add(identifier)
     return found
 
 
-def texture_keys(relative: str) -> set[str]:
-    data = read_json(relative)
-    return set(data.get("texture_data", {})) if data else set()
-
-
-def validate_manifest(relative: str, manifest: dict | None) -> None:
-    if not manifest:
+def validate_recipes(known_items: set[str]) -> None:
+    folder = ROOT / "behavior_pack/recipes"
+    if not folder.is_dir():
+        error("Missing directory: behavior_pack/recipes")
         return
-    if manifest.get("format_version") != 2:
-        error(f"{relative}: expected manifest format_version 2")
-    header = manifest.get("header", {})
-    if not isinstance(header.get("name"), str) or not header.get("name", "").strip():
-        error(f"{relative}: header.name must be a non-empty string")
-    for key in ("version", "min_engine_version"):
-        value = header.get(key)
-        if not isinstance(value, list) or len(value) != 3 or not all(
-                isinstance(part, int) and part >= 0 for part in value):
-            error(f"{relative}: header.{key} must be a three-part non-negative version")
-    modules = manifest.get("modules")
-    if not isinstance(modules, list) or not modules:
-        error(f"{relative}: at least one module is required")
-
-
-def validate_recipes(known: set[str]) -> None:
     recipe_ids: set[str] = set()
-    validate_recipes(known)
-
-    for path in sorted((ROOT / "behavior_pack/loot_tables").rglob("*.json")):
-        data = read_json(path.relative_to(ROOT).as_posix())
+    for path in sorted(folder.glob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
         if not data:
             continue
-        for pool in data.get("pools", []):
-            for entry in pool.get("entries", []):
-                name = entry.get("name")
-                if entry.get("type") == "item" and name and name not in known:
-                    error(f"{path.relative_to(ROOT)}: unknown loot item '{name}'")
+        recipe_types = [key for key in ("minecraft:recipe_shaped", "minecraft:recipe_shapeless") if key in data]
+        if len(recipe_types) != 1:
+            error(f"{relative}: expected exactly one supported recipe definition")
+            continue
+        recipe = data[recipe_types[0]]
+        if not isinstance(recipe, dict):
+            error(f"{relative}: recipe definition must be an object")
+            continue
+        description = recipe.get("description", {})
+        identifier = description.get("identifier") if isinstance(description, dict) else None
+        if not isinstance(identifier, str) or ":" not in identifier:
+            error(f"{relative}: missing namespaced recipe identifier")
+        elif identifier in recipe_ids:
+            error(f"{relative}: duplicate recipe identifier {identifier}")
+        else:
+            recipe_ids.add(identifier)
+        result = recipe.get("result", {})
+        result_item = result.get("item") if isinstance(result, dict) else None
+        count = result.get("count", 1) if isinstance(result, dict) else 0
+        if result_item not in known_items:
+            error(f"{relative}: unknown recipe result '{result_item}'")
+        if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+            error(f"{relative}: result.count must be a positive integer")
+        if recipe_types[0] == "minecraft:recipe_shaped":
+            pattern = recipe.get("pattern")
+            key_map = recipe.get("key")
+            if not isinstance(pattern, list) or not pattern or not all(isinstance(row, str) for row in pattern):
+                error(f"{relative}: shaped recipe pattern must be a non-empty list of strings")
+                continue
+            if len({len(row) for row in pattern}) != 1 or len(pattern) > 3 or len(pattern[0]) > 3:
+                error(f"{relative}: shaped recipe pattern must be rectangular and at most 3x3")
+            if not isinstance(key_map, dict):
+                error(f"{relative}: shaped recipe key must be an object")
+                continue
+            used_symbols = set("".join(pattern)) - {" "}
+            for symbol in used_symbols:
+                ingredient = key_map.get(symbol)
+                item = ingredient.get("item") if isinstance(ingredient, dict) else None
+                if item not in known_items:
+                    error(f"{relative}: pattern symbol '{symbol}' has an unknown or missing ingredient")
+            unused = set(key_map) - used_symbols
+            if unused:
+                warn(f"{relative}: unused key symbols: {', '.join(sorted(unused))}")
+        else:
+            ingredients = recipe.get("ingredients")
+            if not isinstance(ingredients, list) or not ingredients:
+                error(f"{relative}: shapeless recipe needs at least one ingredient")
+                continue
+            for ingredient in ingredients:
+                item = ingredient.get("item") if isinstance(ingredient, dict) else None
+                if item not in known_items:
+                    error(f"{relative}: unknown or missing shapeless ingredient '{item}'")
 
-    for atlas, keys in (("resource_pack/textures/item_texture.json", item_keys),
-                        ("resource_pack/textures/terrain_texture.json", terrain_keys)):
+
+def validate_loot_tables(known_items: set[str]) -> None:
+    folder = ROOT / "behavior_pack/loot_tables"
+    if not folder.is_dir():
+        warn("No loot_tables directory found")
+        return
+    for path in sorted(folder.rglob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
+        if not data:
+            continue
+        pools = data.get("pools")
+        if not isinstance(pools, list) or not pools:
+            error(f"{relative}: loot table must contain at least one pool")
+            continue
+        for pool in pools:
+            if not isinstance(pool, dict):
+                error(f"{relative}: loot pool must be an object")
+                continue
+            for entry in pool.get("entries", []):
+                if isinstance(entry, dict) and entry.get("type") == "item":
+                    name = entry.get("name")
+                    if name not in known_items:
+                        error(f"{relative}: unknown loot item '{name}'")
+
+
+def validate_textures() -> None:
+    for atlas in ("resource_pack/textures/item_texture.json", "resource_pack/textures/terrain_texture.json"):
         data = read_json(atlas)
         if not data:
             continue
-        for key, entry in data.get("texture_data", {}).items():
-            raw = entry.get("textures")
+        texture_data = data.get("texture_data")
+        if not isinstance(texture_data, dict):
+            error(f"{atlas}: texture_data must be an object")
+            continue
+        for key, entry in texture_data.items():
+            raw = entry.get("textures") if isinstance(entry, dict) else None
             values = raw if isinstance(raw, list) else [raw]
             for value in values:
-                if not isinstance(value, str):
+                if not isinstance(value, str) or not value:
                     error(f"{atlas}: invalid texture path for '{key}'")
                     continue
                 image_path = ROOT / "resource_pack" / (value + ("" if value.endswith(".png") else ".png"))
                 if not image_path.is_file():
                     error(f"{atlas}: missing texture file {image_path.relative_to(ROOT)}")
+                    continue
+                header = image_path.read_bytes()[:24]
+                if len(header) != 24 or header[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
+                    error(f"{image_path.relative_to(ROOT)}: invalid PNG header")
                 else:
-                    header = image_path.read_bytes()[:24]
-                    if len(header) != 24 or header[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
-                        error(f"{image_path.relative_to(ROOT)}: not a valid PNG header")
-                    else:
-                        width, height = struct.unpack(">II", header[16:24])
-                        if width < 1 or height < 1:
-                            error(f"{image_path.relative_to(ROOT)}: invalid image dimensions")
+                    width, height = struct.unpack(">II", header[16:24])
+                    if width < 1 or height < 1:
+                        error(f"{image_path.relative_to(ROOT)}: invalid PNG dimensions")
+    files = list((ROOT / "resource_pack/textures").rglob("*.png"))
+    hashes: dict[str, list[str]] = {}
+    for path in files:
+        hashes.setdefault(hashlib.sha256(path.read_bytes()).hexdigest(), []).append(
+            path.relative_to(ROOT).as_posix()
+        )
+    for paths in hashes.values():
+        if len(paths) > 1:
+            warn("Identical texture files (review whether intentional): " + ", ".join(paths))
 
-    texture_files = list((ROOT / "resource_pack/textures").rglob("*.png"))
-    if len(texture_files) > 1:
-        hashes = {}
-        import hashlib
-        for path in texture_files:
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
-            hashes.setdefault(digest, []).append(path.relative_to(ROOT).as_posix())
-        for paths in hashes.values():
-            if len(paths) > 1:
-                warn("Identical texture files (may be intentional placeholders): " + ", ".join(paths))
+
+def validate_localization() -> None:
+    relative = "resource_pack/texts/languages.json"
+    languages = ROOT / relative
+    if not languages.is_file():
+        error(f"Missing localization index: {relative}")
+        return
+    try:
+        codes = json.loads(languages.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        error(f"Invalid {relative}: {exc}")
+        return
+    if not isinstance(codes, list) or not codes:
+        error(f"{relative}: expected a non-empty array of language codes")
+        return
+    required = {"item.aetherium:crystal.name", "tile.aetherium:crystal_block.name"}
+    for code in codes:
+        if not isinstance(code, str) or not re.fullmatch(r"[a-z]{2}_[A-Z]{2}", code):
+            error(f"{relative}: invalid language code '{code}'")
+            continue
+        lang_path = ROOT / "resource_pack/texts" / f"{code}.lang"
+        if not lang_path.is_file():
+            error(f"Missing language file: {lang_path.relative_to(ROOT)}")
+            continue
+        entries = {}
+        for line in lang_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            entries[key.strip()] = value.strip()
+        for key in required:
+            if not entries.get(key):
+                error(f"{lang_path.relative_to(ROOT)}: missing translation '{key}'")
+
+
+def main() -> int:
+    bp_path = "behavior_pack/manifest.json"
+    rp_path = "resource_pack/manifest.json"
+    bp = read_json(bp_path)
+    rp = read_json(rp_path)
+    bp_uuids = validate_manifest(bp_path, bp)
+    rp_uuids = validate_manifest(rp_path, rp)
+    if bp and rp:
+        bp_version = bp.get("header", {}).get("version")
+        rp_version = rp.get("header", {}).get("version")
+        if bp_version != rp_version:
+            error("Behavior-pack and resource-pack header versions do not match")
+        dependencies = bp.get("dependencies", [])
+        if not any(
+            isinstance(dep, dict)
+            and dep.get("uuid", "").lower() == rp.get("header", {}).get("uuid", "").lower()
+            and dep.get("version") == rp_version
+            for dep in dependencies if isinstance(dep, dict)
+        ):
+            error("Behavior pack is missing the matching resource-pack dependency")
+    if bp_uuids & rp_uuids:
+        error("Behavior-pack and resource-pack manifest UUIDs must be unique")
+
+    items = identifiers("behavior_pack/items", "minecraft:item")
+    blocks = identifiers("behavior_pack/blocks", "minecraft:block")
+    known = items | blocks
+    validate_recipes(known)
+    validate_loot_tables(known)
+    validate_textures()
+    validate_localization()
 
     for message in WARNINGS:
         print("WARN: " + message)
