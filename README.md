@@ -35,7 +35,7 @@ The ore and raw-crystal now have separate original 16×16 pixel-art textures. Th
 
 ## Planned Industry processing
 
-The first planned machine is the Grinder. Its agreed Aetherium Ore recipe is 1 ore block → 2 Raw Aetherium Crystals (2× yield). The Grinder is not implemented yet; direct mining drops remain unchanged until its container and Script API processing have been tested in Bedrock. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
+The first planned machine is the universal Grinder. Its base rule is 1 supported ore block → 2 units of that ore's primary material (2× baseline). It will support vanilla ores, all AETHERIUM ores including The Lost Realms, and other add-ons through explicit compatibility recipes. The Grinder is not implemented yet; normal mining drops remain unchanged until its container and Script API processing have been tested in Bedrock. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
 
 ## Planned modules
 

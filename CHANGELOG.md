@@ -2,6 +2,14 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## Unreleased – Universal Grinder design
+
+- Expanded the Grinder specification from Aetherium Ore only to all supported vanilla and AETHERIUM ores.
+- Set a baseline output of 2 primary-material items per ore block, with explicit mappings for ore types.
+- Added planned compatibility registry for third-party add-ons and future The Lost Realms ores.
+- Kept normal mining drops unchanged until the actual machine is implemented and tested.
+
+
 ## 0.3.3 – First refining material
 
 - Added the Aetherium Ingot item as the first refined progression material.

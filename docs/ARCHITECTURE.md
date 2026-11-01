@@ -18,7 +18,7 @@ Core will eventually own:
 Each planned module owns its gameplay content and depends on Core rather than reaching into another module's private implementation.
 
 - Power defines generation and storage providers.
-- Industry defines processing machines and processing recipes. The first planned machine is the Grinder, with a target base yield of 2 Raw Aetherium Crystals from 1 Aetherium Ore block. Machine processing must preserve outputs when inventories are full and must not duplicate items across unloads or restarts.
+- Industry defines processing machines and processing recipes. The first planned machine is the universal Grinder, with a baseline yield of 2 units of mapped primary material per supported ore block. It will use an explicit ore-to-output registry for vanilla ores, all AETHERIUM ores, and optional third-party compatibility entries. Machine processing must preserve outputs when inventories are full and must not duplicate items across unloads or restarts.
 - Logistics moves resources between inventories and endpoints.
 - Network provides digital storage, crafting orchestration, and remote transfer.
 - Automation plans and schedules production using interfaces exposed by other modules.

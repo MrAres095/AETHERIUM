@@ -34,8 +34,11 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Create a distinct original Aetherium Ingot texture
 
 ## Milestone 2 – Industry processing prototype
-- [x] Define Grinder yield: 1 Aetherium Ore → 2 Raw Aetherium Crystals (2×)
+- [x] Define universal Grinder: 1 supported ore block → 2 units of its mapped primary material (2× baseline)
+- [x] Include vanilla ore mappings and future AETHERIUM/The Lost Realms ore support
+- [x] Define an explicit compatibility registry for other add-ons
 - [ ] Add Grinder block, inventory/container, and original textures
+- [ ] Implement data-driven ore-to-output recipe registry
 - [ ] Implement safe input/output processing with no item loss or duplication
 - [ ] Test Grinder on Android, Windows, and Bedrock Dedicated Server
 
