@@ -16,8 +16,10 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Create matching resource pack and original placeholder textures
 - [x] Link the behavior pack to its resource pack dependency
 - [x] Add local static integrity validator and validation instructions
+- [x] Add local .mcaddon build script and packaging instructions
 - [ ] Validate pack import and content in Minecraft Bedrock
 - [ ] Confirm behavior on Android and Windows Bedrock
+- [ ] Replace placeholder textures with distinct final pixel-art assets
 - [ ] Define material progression and expand the Core material set
 
 ## Milestone 2 – Power prototype
