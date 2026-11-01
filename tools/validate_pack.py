@@ -244,6 +244,40 @@ def validate_textures() -> None:
             warn("Identical texture files (review whether intentional): " + ", ".join(paths))
 
 
+def validate_content_references() -> None:
+    item_atlas = read_json("resource_pack/textures/item_texture.json") or {}
+    terrain_atlas = read_json("resource_pack/textures/terrain_texture.json") or {}
+    item_keys = set(item_atlas.get("texture_data", {}))
+    terrain_keys = set(terrain_atlas.get("texture_data", {}))
+
+    for path in sorted((ROOT / "behavior_pack/items").glob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
+        if not data:
+            continue
+        components = data.get("minecraft:item", {}).get("components", {})
+        icon = components.get("minecraft:icon")
+        if isinstance(icon, dict):
+            icon = icon.get("texture")
+        if not isinstance(icon, str) or icon not in item_keys:
+            error(f"{relative}: item icon '{icon}' is missing from item_texture.json")
+
+    for path in sorted((ROOT / "behavior_pack/blocks").glob("*.json")):
+        relative = path.relative_to(ROOT).as_posix()
+        data = read_json(relative)
+        if not data:
+            continue
+        components = data.get("minecraft:block", {}).get("components", {})
+        instances = components.get("minecraft:material_instances", {})
+        if isinstance(instances, dict):
+            for slot, material in instances.items():
+                texture = material.get("texture") if isinstance(material, dict) else None
+                if texture not in terrain_keys:
+                    error(f"{relative}: material texture '{texture}' for slot '{slot}' is missing from terrain_texture.json")
+        loot_path = components.get("minecraft:loot")
+        if isinstance(loot_path, str) and not (ROOT / "behavior_pack" / loot_path).is_file():
+            error(f"{relative}: referenced loot table does not exist: {loot_path}")
+
 def validate_localization() -> None:
     relative = "resource_pack/texts/languages.json"
     languages = ROOT / relative
@@ -308,6 +342,7 @@ def main() -> int:
     validate_recipes(known)
     validate_loot_tables(known)
     validate_textures()
+    validate_content_references()
     validate_localization()
 
     for message in WARNINGS:
