@@ -10,20 +10,24 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Import and run the smoke test in Minecraft Bedrock
 
 ## Milestone 1 – Core content prototype
-- [x] Add original Aetherium Crystal item
-- [x] Add original Aetherium Crystal Block
+- [x] Add original Aetherium Crystal item and Crystal Block
 - [x] Add block-to-item and item-to-block recipes
-- [x] Create matching resource pack and original placeholder textures
+- [x] Create matching resource pack and placeholder textures
 - [x] Link the behavior pack to its resource pack dependency
-- [x] Add local static integrity validator and validation instructions
-- [x] Add unit tests for manifest and recipe validation\n- [x] Add unit tests for manifest and recipe validation
+- [x] Add local static integrity validator and unit tests
 - [x] Add local .mcaddon build script and packaging instructions
 - [x] Add Croatian language strings and register hr_HR
-- [x] Add a Core test-kit function for in-game checks
-- [ ] Validate pack import and content in Minecraft Bedrock
-- [ ] Confirm behavior on Android and Windows Bedrock
+- [x] Add a Core test-kit function
+- [x] Add Raw Aetherium Crystal item
+- [x] Add Aetherium Ore block and raw-crystal loot table
+- [x] Add an Overworld ore feature and feature rule
+- [x] Add English/Croatian names for ore progression
+- [x] Add static checks for feature and feature-rule references
+- [ ] Verify ore generation in a new Bedrock world
+- [ ] Confirm ore drops and pack behavior on Android and Windows
+- [ ] Confirm compatibility with Bedrock Dedicated Server
 - [ ] Replace placeholder textures with distinct final pixel-art assets
-- [ ] Define material progression and expand the Core material set
+- [ ] Add a balanced raw-material refining recipe
 
 ## Milestone 2 – Power prototype
 - [ ] Define energy units and transfer rules
