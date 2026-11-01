@@ -8,11 +8,12 @@ All notable AETHERIUM project changes are recorded here.
 - Added `aetherium:raw_crystal` as the ore's drop.
 - Added an ore feature and Overworld underground feature rule targeting stone and deepslate.
 - Added English and Croatian names for the ore and raw material.
+- Added distinct original 16×16 pixel-art textures for the raw crystal and ore block.
 - Expanded the test kit with raw crystals and ore blocks.
 - Extended static validation to check feature identifiers, placed blocks, feature-rule references, biome filters, and distribution bounds.
 - Updated the pack manifests and development metadata to 0.3.0.
 
-**Status:** Development prototype. World generation, mining drops, Android/Windows behavior, and BDS compatibility still require in-game testing. Ore/raw material textures remain placeholders.
+**Status:** Development prototype. World generation, mining drops, Android/Windows behavior, and BDS compatibility still require in-game testing. Crystal item and crystal-block textures remain placeholders; the new ore and raw-material textures are original 16×16 pixel art.
 
 ## 0.2.0 – Core prototype
 
