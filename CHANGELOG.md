@@ -10,7 +10,9 @@ All notable AETHERIUM project changes are recorded here.
 - Added the matching resource pack, texture atlases, and English/Croatian display names.
 - Added the behavior-pack dependency on the resource pack.
 - Added a test-kit function for repeatable in-game checks.
-- Added a local static validator for manifests, recipes, localization, texture references, and loot tables.\n- Repaired validator control flow and expanded cross-reference checks for icons, block textures, and loot paths.\n- Added unit tests for manifest and recipe validation.
+- Added a local static validator for manifests, recipes, localization, texture references, and loot tables.
+- Repaired validator control flow and expanded cross-reference checks for icons, block textures, and loot paths.
+- Added unit tests for manifest and recipe validation.\n- Repaired validator control flow and expanded cross-reference checks for icons, block textures, and loot paths.\n- Added unit tests for manifest and recipe validation.
 - Added a local .mcaddon build script that packages separate .mcpack archives without GitHub Actions.
 - Expanded build, validation, and Android/Windows/BDS test documentation.
 
