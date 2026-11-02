@@ -35,7 +35,9 @@ The ore and raw-crystal now have separate original 16×16 pixel-art textures. Th
 
 ## Planned Industry processing
 
-The first planned machine is the universal Grinder. Its base rule is 1 supported ore block → 2 units of that ore's primary material (2× baseline). It will support vanilla ores, all AETHERIUM ores including The Lost Realms, and other add-ons through explicit compatibility recipes. The initial 22-entry Grinder recipe registry is stored in `behavior_pack/industry/grinder_recipes.json`, but it is not yet connected to a machine. The Grinder block, inventory UI and Script API processing are still unimplemented; normal mining drops remain unchanged. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
+The first machine family is the Grinder: a **Manual Grinder** for early-game hand operation and an **Electric Grinder** connected to Aetherium Power. The baseline recipe is 1 supported ore block → 2 units of its primary material. The initial 22-entry recipe registry is stored in `behavior_pack/industry/grinder_recipes.json`, but it is not yet connected to an in-game machine. The Grinder blocks, inventory UI and Script API processing are still unimplemented; normal mining drops remain unchanged.
+
+The Electric Grinder and future compatible machines will share three upgrade slots: Speed, Yield and Energy. Each slot accepts Tier I, II or III modules, and mixed tiers are allowed. The combined modules determine machine performance and visual state: Basic keeps the classic look, Advanced adds a noticeable machine-specific mechanism/effect, and three Ultimate modules unlock the full machine-specific presentation such as levitation, animated Aetherium energy rings and particles. See [docs/INDUSTRY.md](docs/INDUSTRY.md) and [docs/GRINDER_RUNTIME_SPIKE.md](docs/GRINDER_RUNTIME_SPIKE.md).
 
 ## Planned modules
 
@@ -65,7 +67,7 @@ The build script validates first, then creates `dist/AETHERIUM-X.Y.Z.mcaddon` co
 
 ## Next milestone
 
-Verify ore generation and drops in Bedrock, test the new furnace recipe in Bedrock, then design the first powered processing machine. The ingot is the first intermediate metal for machine and portal progression.
+Verify ore generation and drops in Bedrock, test the new furnace recipe in Bedrock, then prototype the first machine interaction and inventory path on the supported Android client and BDS. The ingot is the first intermediate metal for machine and portal progression.
 
 ## Testing
 
