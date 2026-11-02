@@ -364,6 +364,40 @@ def validate_worldgen(known_blocks: set[str]) -> None:
                     error(f"{relative}: distribution.{axis}.extent must be two ordered integer bounds")
 
 
+def validate_grinder_registry() -> None:
+    relative = "behavior_pack/industry/grinder_recipes.json"
+    data = read_json(relative)
+    if not data:
+        return
+    if data.get("schema_version") != 1:
+        error(f"{relative}: schema_version must be 1")
+    if data.get("machine") != "aetherium:grinder":
+        error(f"{relative}: machine must be aetherium:grinder")
+    default_count = data.get("default_output_count")
+    if not isinstance(default_count, int) or isinstance(default_count, bool) or default_count < 1:
+        error(f"{relative}: default_output_count must be a positive integer")
+    recipes = data.get("recipes")
+    if not isinstance(recipes, list) or not recipes:
+        error(f"{relative}: recipes must be a non-empty list")
+        return
+    seen_inputs: set[str] = set()
+    for index, recipe in enumerate(recipes):
+        label = f"{relative}: recipes[{index}]"
+        if not isinstance(recipe, dict):
+            error(f"{label} must be an object")
+            continue
+        input_id, output_id = recipe.get("input"), recipe.get("output")
+        for field, value in (("input", input_id), ("output", output_id)):
+            if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+", value):
+                error(f"{label}.{field} must be a namespaced identifier")
+        if isinstance(input_id, str):
+            if input_id in seen_inputs:
+                error(f"{label}: duplicate input mapping '{input_id}'")
+            seen_inputs.add(input_id)
+        count = recipe.get("count")
+        if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+            error(f"{label}.count must be a positive integer")
+
 def validate_localization() -> None:
     relative = "resource_pack/texts/languages.json"
     languages = ROOT / relative
@@ -431,6 +465,7 @@ def main() -> int:
     validate_content_references()
     validate_worldgen(blocks)
     validate_localization()
+    validate_grinder_registry()
 
     for message in WARNINGS:
         print("WARN: " + message)

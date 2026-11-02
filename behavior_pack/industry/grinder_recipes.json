@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "machine": "aetherium:grinder",
+  "description": "Design-time recipe registry; not yet consumed by a Bedrock Script API runtime.",
+  "default_output_count": 2,
+  "recipes": [
+    {
+      "input": "minecraft:iron_ore",
+      "output": "minecraft:raw_iron",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_iron_ore",
+      "output": "minecraft:raw_iron",
+      "count": 2
+    },
+    {
+      "input": "minecraft:gold_ore",
+      "output": "minecraft:raw_gold",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_gold_ore",
+      "output": "minecraft:raw_gold",
+      "count": 2
+    },
+    {
+      "input": "minecraft:copper_ore",
+      "output": "minecraft:raw_copper",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_copper_ore",
+      "output": "minecraft:raw_copper",
+      "count": 2
+    },
+    {
+      "input": "minecraft:coal_ore",
+      "output": "minecraft:coal",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_coal_ore",
+      "output": "minecraft:coal",
+      "count": 2
+    },
+    {
+      "input": "minecraft:diamond_ore",
+      "output": "minecraft:diamond",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_diamond_ore",
+      "output": "minecraft:diamond",
+      "count": 2
+    },
+    {
+      "input": "minecraft:emerald_ore",
+      "output": "minecraft:emerald",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_emerald_ore",
+      "output": "minecraft:emerald",
+      "count": 2
+    },
+    {
+      "input": "minecraft:lapis_ore",
+      "output": "minecraft:lapis_lazuli",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_lapis_ore",
+      "output": "minecraft:lapis_lazuli",
+      "count": 2
+    },
+    {
+      "input": "minecraft:redstone_ore",
+      "output": "minecraft:redstone",
+      "count": 2
+    },
+    {
+      "input": "minecraft:lit_redstone_ore",
+      "output": "minecraft:redstone",
+      "count": 2
+    },
+    {
+      "input": "minecraft:deepslate_redstone_ore",
+      "output": "minecraft:redstone",
+      "count": 2
+    },
+    {
+      "input": "minecraft:lit_deepslate_redstone_ore",
+      "output": "minecraft:redstone",
+      "count": 2
+    },
+    {
+      "input": "minecraft:nether_gold_ore",
+      "output": "minecraft:gold_nugget",
+      "count": 2
+    },
+    {
+      "input": "minecraft:nether_quartz_ore",
+      "output": "minecraft:quartz",
+      "count": 2
+    },
+    {
+      "input": "minecraft:ancient_debris",
+      "output": "minecraft:netherite_scrap",
+      "count": 2
+    }
+  ]
+}

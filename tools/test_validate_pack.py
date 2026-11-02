@@ -119,6 +119,26 @@ class ValidatorTests(unittest.TestCase):
         validator.validate_recipes({"aetherium:raw_crystal"})
         self.assertTrue(any("unknown furnace output" in message for message in validator.ERRORS))
 
+    def test_valid_grinder_registry_passes(self):
+        self.write_json("behavior_pack/industry/grinder_recipes.json", {
+            "schema_version": 1, "machine": "aetherium:grinder", "default_output_count": 2,
+            "recipes": [{"input": "minecraft:iron_ore", "output": "minecraft:raw_iron", "count": 2}],
+        })
+        validator.validate_grinder_registry()
+        self.assertEqual(validator.ERRORS, [])
+
+    def test_grinder_registry_rejects_duplicate_inputs_and_invalid_counts(self):
+        self.write_json("behavior_pack/industry/grinder_recipes.json", {
+            "schema_version": 1, "machine": "aetherium:grinder", "default_output_count": 2,
+            "recipes": [
+                {"input": "minecraft:iron_ore", "output": "minecraft:raw_iron", "count": 2},
+                {"input": "minecraft:iron_ore", "output": "minecraft:raw_iron", "count": 0},
+            ],
+        })
+        validator.validate_grinder_registry()
+        self.assertTrue(any("duplicate input mapping" in message for message in validator.ERRORS))
+        self.assertTrue(any(".count must be a positive integer" in message for message in validator.ERRORS))
+
     def test_worldgen_feature_and_rule_link(self):
         self.write_json("behavior_pack/features/aetherium_ore_feature.json", {
             "minecraft:ore_feature": {
