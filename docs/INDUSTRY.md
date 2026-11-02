@@ -41,4 +41,4 @@ The runtime must use an explicit transaction: validate input and full output cap
 
 ### Current status
 
-The JSON registry and static validation hook are present in the repository. The registry is design data only: no Grinder block, UI, inventory or runtime processor is implemented yet. Normal ore drops are unchanged. Automated tests and in-game behavior still need execution/verification.
+The JSON registry and static validation hook are present. An engine-independent JavaScript transaction planner now calculates output stacks, fills compatible stacks before empty slots, and refuses to consume input unless the complete output fits. Six Node.js unit tests for that planner were executed successfully in the development environment. This is processor logic only: it is not yet connected to a Bedrock Script API event, a machine entity, persistent storage or an in-game inventory UI. Normal ore drops are unchanged. Android, Windows Bedrock and BDS behavior remain untested.
