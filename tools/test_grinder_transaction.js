@@ -72,3 +72,32 @@ test("rejects invalid adapters and full output storage", () => {
   assert.equal(executeGrind(store, recipes).reason, "output_full");
   assert.equal(store.input.amount, 1);
 });
+
+test("reports storage read failures and releases the transaction lock", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
+  const readInput = store.readInput.bind(store);
+  store.readInput = () => { throw new Error("simulated read failure"); };
+
+  assert.equal(executeGrind(store, recipes).reason, "storage_read_failed");
+
+  store.readInput = readInput;
+  assert.equal(executeGrind(store, recipes).ok, true);
+  assert.equal(store.input, null);
+  assert.equal(store.outputs[0].amount, 2);
+});
+
+test("rejects reentrant processing against the same storage object", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
+  let nestedResult;
+  const writeOutputs = store.writeOutputs.bind(store);
+  store.writeOutputs = value => {
+    nestedResult = executeGrind(store, recipes);
+    writeOutputs(value);
+  };
+
+  const result = executeGrind(store, recipes);
+  assert.equal(result.ok, true);
+  assert.equal(nestedResult.reason, "transaction_in_progress");
+  assert.equal(store.input, null);
+  assert.equal(store.outputs[0].amount, 2);
+});
