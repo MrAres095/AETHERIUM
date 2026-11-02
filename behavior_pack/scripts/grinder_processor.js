@@ -2,10 +2,7 @@
 
 /**
  * Engine-independent Grinder transaction planner.
- *
- * This module plans a complete inventory transition without mutating the
- * supplied slots. A Bedrock-specific adapter must apply the returned plan
- * and persist it as one guarded operation.
+ * Plans a complete inventory transition without mutating supplied slots.
  */
 
 const DEFAULT_STACK_LIMIT = 64;
@@ -34,23 +31,34 @@ function cloneSlot(slot) {
   };
 }
 
-function findRecipe(inputTypeId, registry) {
-  let match = null;
-  for (const recipe of registry.recipes) {
-    if (!recipe || recipe.input !== inputTypeId) continue;
-    if (match) return { error: "ambiguous_recipe" };
-    match = recipe;
+/** Validate every mapping, not only the mapping selected by this input. */
+function validateRecipeRegistry(registry) {
+  if (!registry || !Array.isArray(registry.recipes) || registry.recipes.length === 0) {
+    return "invalid_inventory_or_registry";
   }
-  if (!match) return { error: "no_recipe" };
 
-  const maxStackSize = match.max_stack_size ?? DEFAULT_STACK_LIMIT;
-  if (typeof match.output !== "string" || !ITEM_ID.test(match.output) ||
-      !Number.isInteger(match.count) || match.count < 1 ||
-      !Number.isInteger(maxStackSize) || maxStackSize < 1 ||
-      maxStackSize > DEFAULT_STACK_LIMIT) {
-    return { error: "invalid_recipe" };
+  const seenInputs = new Set();
+  for (const recipe of registry.recipes) {
+    if (!recipe || typeof recipe !== "object" || Array.isArray(recipe) ||
+        typeof recipe.input !== "string" || !ITEM_ID.test(recipe.input) ||
+        typeof recipe.output !== "string" || !ITEM_ID.test(recipe.output) ||
+        !Number.isInteger(recipe.count) || recipe.count < 1) {
+      return "invalid_recipe_registry";
+    }
+
+    const maxStackSize = recipe.max_stack_size ?? DEFAULT_STACK_LIMIT;
+    if (!Number.isInteger(maxStackSize) || maxStackSize < 1 ||
+        maxStackSize > DEFAULT_STACK_LIMIT) {
+      return "invalid_recipe_registry";
+    }
+    if (seenInputs.has(recipe.input)) return "ambiguous_recipe";
+    seenInputs.add(recipe.input);
   }
-  return { recipe: match, maxStackSize };
+  return null;
+}
+
+function findRecipe(inputTypeId, registry) {
+  return { recipe: registry.recipes.find(recipe => recipe.input === inputTypeId) || null };
 }
 
 /**
@@ -66,9 +74,12 @@ function planGrind(inputSlot, outputSlots, recipeRegistry) {
     return failure("invalid_output_inventory");
   }
 
-  const found = findRecipe(inputSlot.typeId, recipeRegistry);
-  if (found.error) return failure(found.error);
-  const { recipe, maxStackSize } = found;
+  const registryError = validateRecipeRegistry(recipeRegistry);
+  if (registryError) return failure(registryError);
+
+  const { recipe } = findRecipe(inputSlot.typeId, recipeRegistry);
+  if (!recipe) return failure("no_recipe");
+  const maxStackSize = recipe.max_stack_size ?? DEFAULT_STACK_LIMIT;
 
   const nextSlots = outputSlots.map(cloneSlot);
   let remaining = recipe.count;
@@ -95,7 +106,7 @@ function planGrind(inputSlot, outputSlots, recipeRegistry) {
     remaining -= moved;
   }
 
-  // No input consumption is proposed unless the complete output fits.
+  // No input consumption unless the complete output fits.
   if (remaining > 0) return failure("output_full");
 
   return {
@@ -108,4 +119,4 @@ function planGrind(inputSlot, outputSlots, recipeRegistry) {
   };
 }
 
-module.exports = { planGrind };
+module.exports = { planGrind, validateRecipeRegistry };
