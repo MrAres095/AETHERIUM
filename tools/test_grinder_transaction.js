@@ -141,6 +141,20 @@ test("copies live adapter snapshots before writes can mutate them", () => {
   assert.deepEqual(store.outputs, [null]);
 });
 
+test("copies the live input snapshot before a partial input write", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 2 }, [null]);
+  store.readInput = () => store.input;
+  store.writeInput = value => {
+    store.input.amount = value.amount;
+    throw new Error("partial input write after mutating live input");
+  };
+
+  const result = executeGrind(store, recipes);
+  assert.equal(result.reason, "input_write_failed_rolled_back");
+  assert.deepEqual(store.input, { typeId: "minecraft:iron_ore", amount: 2 });
+  assert.deepEqual(store.outputs, [null]);
+});
+
 test("rejects invalid adapters and full output storage", () => {
   assert.equal(executeGrind({}, recipes).reason, "invalid_storage_adapter");
   const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [
