@@ -17,6 +17,7 @@ The validator checks:
 - Manifest format, required header fields, three-part versions, and module presence.
 - The behavior-pack dependency against the resource-pack header UUID and version.
 - Item icon and block material texture keys against their atlases.
+- Every registered item and block display-name translation key against every language declared in `resource_pack/texts/languages.json`.
 - Referenced texture files and PNG signatures/dimensions.
 - Recipe identifiers, shaped-pattern dimensions/key symbols, ingredients, result identifiers, and positive result counts.
 - Registered language files and required item/block localization keys.
