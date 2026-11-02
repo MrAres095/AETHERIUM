@@ -149,7 +149,7 @@ class ValidatorTests(unittest.TestCase):
         texts = self.root / "resource_pack/texts"
         texts.mkdir(parents=True, exist_ok=True)
         (texts / "en_US.lang").write_text(
-            "item.aetherium:test_item.name=Test Item\\ntile.aetherium:test_block.name=Test Block",
+            "item.aetherium:test_item.name=Test Item\ntile.aetherium:test_block.name=Test Block",
             encoding="utf-8",
         )
         (texts / "hr_HR.lang").write_text(
@@ -191,7 +191,7 @@ class ValidatorTests(unittest.TestCase):
         texts = self.root / "resource_pack/texts"
         texts.mkdir(parents=True, exist_ok=True)
         (texts / "en_US.lang").write_text(
-            "item.aetherium:test_item.name=Test Item\\ntile.aetherium:test_block.name=Test Block",
+            "item.aetherium:test_item.name=Test Item\ntile.aetherium:test_block.name=Test Block",
             encoding="utf-8",
         )
 
