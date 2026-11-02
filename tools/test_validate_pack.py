@@ -215,8 +215,8 @@ class ValidatorTests(unittest.TestCase):
             "tile.aetherium:ore.name",
         ]
         english = "\n".join(f"{key}=English" for key in required)
-        croatian = "\n".join(f"{key}=Croatian" for key in required[:-1])
-        (texts / "en_US.lang").write_text(english + "\nitem.extra=Extra\n", encoding="utf-8")
+        croatian = "\n".join(f"{key}=Croatian" for key in required[:-1]) + "\nitem.extra=Extra"
+        (texts / "en_US.lang").write_text(english, encoding="utf-8")
         (texts / "hr_HR.lang").write_text(croatian, encoding="utf-8")
         validator.validate_localization()
         self.assertTrue(any("missing keys present in other languages" in message
