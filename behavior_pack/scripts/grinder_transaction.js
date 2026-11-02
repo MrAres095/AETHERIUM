@@ -30,8 +30,14 @@ function executeGrind(storage, recipeRegistry) {
 
   activeStores.add(storage);
   try {
-    const inputBefore = storage.readInput();
-    const outputsBefore = storage.readOutputs();
+    let inputBefore;
+    let outputsBefore;
+    try {
+      inputBefore = storage.readInput();
+      outputsBefore = storage.readOutputs();
+    } catch {
+      return { ok: false, reason: "storage_read_failed" };
+    }
     const plan = planGrind(inputBefore, outputsBefore, recipeRegistry);
     if (!plan.ok) return plan;
 
