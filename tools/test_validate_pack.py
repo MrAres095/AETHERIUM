@@ -119,6 +119,85 @@ class ValidatorTests(unittest.TestCase):
         validator.validate_recipes({"aetherium:raw_crystal"})
         self.assertTrue(any("unknown furnace output" in message for message in validator.ERRORS))
 
+    def test_content_references_require_localization_for_each_item_and_block(self):
+        self.write_json("resource_pack/textures/item_texture.json", {
+            "texture_data": {"test_icon": {"textures": "textures/items/test"}}
+        })
+        self.write_json("resource_pack/textures/terrain_texture.json", {
+            "texture_data": {"test_block": {"textures": "textures/blocks/test"}}
+        })
+        self.write_json("resource_pack/texts/languages.json", ["en_US", "hr_HR"])
+        self.write_json("behavior_pack/items/test.json", {
+            "minecraft:item": {
+                "description": {"identifier": "aetherium:test_item"},
+                "components": {
+                    "minecraft:icon": "test_icon",
+                    "minecraft:display_name": {"value": "item.aetherium:test_item.name"},
+                },
+            }
+        })
+        self.write_json("behavior_pack/blocks/test.json", {
+            "minecraft:block": {
+                "description": {"identifier": "aetherium:test_block"},
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {"texture": "test_block"}
+                    }
+                },
+            }
+        })
+        texts = self.root / "resource_pack/texts"
+        texts.mkdir(parents=True, exist_ok=True)
+        (texts / "en_US.lang").write_text(
+            "item.aetherium:test_item.name=Test Item\\ntile.aetherium:test_block.name=Test Block",
+            encoding="utf-8",
+        )
+        (texts / "hr_HR.lang").write_text(
+            "item.aetherium:test_item.name=Test predmet",
+            encoding="utf-8",
+        )
+
+        validator.validate_content_references()
+        self.assertTrue(any("tile.aetherium:test_block.name" in message and "hr_HR" in message
+                            for message in validator.ERRORS))
+
+    def test_content_references_pass_when_all_registered_names_are_localized(self):
+        self.write_json("resource_pack/textures/item_texture.json", {
+            "texture_data": {"test_icon": {"textures": "textures/items/test"}}
+        })
+        self.write_json("resource_pack/textures/terrain_texture.json", {
+            "texture_data": {"test_block": {"textures": "textures/blocks/test"}}
+        })
+        self.write_json("resource_pack/texts/languages.json", ["en_US"])
+        self.write_json("behavior_pack/items/test.json", {
+            "minecraft:item": {
+                "description": {"identifier": "aetherium:test_item"},
+                "components": {
+                    "minecraft:icon": "test_icon",
+                    "minecraft:display_name": {"value": "item.aetherium:test_item.name"},
+                },
+            }
+        })
+        self.write_json("behavior_pack/blocks/test.json", {
+            "minecraft:block": {
+                "description": {"identifier": "aetherium:test_block"},
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {"texture": "test_block"}
+                    }
+                },
+            }
+        })
+        texts = self.root / "resource_pack/texts"
+        texts.mkdir(parents=True, exist_ok=True)
+        (texts / "en_US.lang").write_text(
+            "item.aetherium:test_item.name=Test Item\\ntile.aetherium:test_block.name=Test Block",
+            encoding="utf-8",
+        )
+
+        validator.validate_content_references()
+        self.assertEqual(validator.ERRORS, [])
+
     def test_valid_grinder_registry_passes(self):
         self.write_json("behavior_pack/industry/grinder_recipes.json", {
             "schema_version": 1, "machine": "aetherium:grinder", "default_output_count": 2,
