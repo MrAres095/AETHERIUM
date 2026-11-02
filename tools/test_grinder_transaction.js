@@ -37,7 +37,13 @@ test("commits output and consumes exactly one input", () => {
 
 test("does not change storage if output write fails", () => {
   const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
-  store.failOutputWrite = true;
+  let writes = 0;
+  const original = store.writeOutputs.bind(store);
+  store.writeOutputs = value => {
+    writes += 1;
+    if (writes === 1) throw new Error("simulated first output write failure");
+    original(value);
+  };
   assert.equal(executeGrind(store, recipes).reason, "output_write_failed_rolled_back");
   assert.equal(store.input.amount, 1);
   assert.equal(store.outputs[0], null);
