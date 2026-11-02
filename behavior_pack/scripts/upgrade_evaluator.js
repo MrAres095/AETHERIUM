@@ -61,6 +61,15 @@ function evaluateUpgrades(slots) {
     return tier === null ? 1 : TIER_MULTIPLIERS[role][tier];
   };
 
+  // Generic animation profile; each machine maps these levels to its own
+  // moving parts (e.g. Grinder rollers, drill head, generator rotor).
+  const animationProfiles = {
+    1: { rotationSpeedMultiplier: 1, activeMechanisms: 0, energyEffectLevel: 0 },
+    2: { rotationSpeedMultiplier: 1.5, activeMechanisms: 1, energyEffectLevel: 1 },
+    3: { rotationSpeedMultiplier: 2.25, activeMechanisms: 3, energyEffectLevel: 2 },
+  };
+  const animation = { ...animationProfiles[visualTier] };
+
   return {
     ok: true,
     installed: { ...installed },
@@ -69,6 +78,7 @@ function evaluateUpgrades(slots) {
     energyMultiplier: multiplier("energy"),
     averageTier,
     visualTier,
+    animation,
     ultimateEffects: visualTier === 3,
   };
 }
