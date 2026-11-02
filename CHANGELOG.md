@@ -2,6 +2,13 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## Unreleased – Grinder registry expansion
+
+- Added Aetherium Ore → 2 Raw Aetherium Crystals to the universal Grinder registry.
+- Documented the initial 22 explicit ore mappings and clarified that the registry is not yet connected to a runtime machine.
+- Kept vanilla and AETHERIUM mining behavior unchanged pending implementation and Bedrock testing.
+
+
 ## Unreleased – Universal Grinder design
 
 - Expanded the Grinder specification from Aetherium Ore only to all supported vanilla and AETHERIUM ores.

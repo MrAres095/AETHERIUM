@@ -5,6 +5,11 @@
   "default_output_count": 2,
   "recipes": [
     {
+      "input": "aetherium:ore",
+      "output": "aetherium:raw_crystal",
+      "count": 2
+    },
+    {
       "input": "minecraft:iron_ore",
       "output": "minecraft:raw_iron",
       "count": 2

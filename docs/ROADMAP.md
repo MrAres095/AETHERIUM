@@ -35,10 +35,12 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 
 ## Milestone 2 – Industry processing prototype
 - [x] Define universal Grinder: 1 supported ore block → 2 units of its mapped primary material (2× baseline)
-- [x] Include vanilla ore mappings and future AETHERIUM/The Lost Realms ore support
+- [x] Include vanilla ore mappings and Aetherium Ore in the explicit registry
+- [x] Reserve future AETHERIUM/The Lost Realms ore support for finalized identifiers
 - [x] Define an explicit compatibility registry for other add-ons
 - [ ] Add Grinder block, inventory/container, and original textures
-- [ ] Implement data-driven ore-to-output recipe registry
+- [x] Add initial JSON ore-to-output registry and static validation
+- [ ] Connect the registry to the actual Grinder runtime
 - [ ] Implement safe input/output processing with no item loss or duplication
 - [ ] Test Grinder on Android, Windows, and Bedrock Dedicated Server
 

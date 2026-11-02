@@ -1,44 +1,38 @@
 # AETHERIUM Industry – Grinder specification
 
-## Grinder: universal ore-processing machine
+## Universal Grinder
 
-The Grinder is the first planned Industry machine. It is designed to process all supported ores, not only Aetherium Ore. Its base goal is to double the material yield compared with mining the same ore block normally.
+The Grinder is the first planned Industry machine. It processes supported ore blocks into their primary material. The baseline design is 1 ore block → 2 output items.
 
-## Base processing rules
+### Initial recipe registry
 
-- Standard input: 1 ore block.
-- Standard output: 2 units of that ore's primary drop or raw material.
-- Aetherium Ore: 1 block → 2 Raw Aetherium Crystals.
-- Iron Ore: 1 block → 2 Raw Iron.
-- Gold Ore: 1 block → 2 Raw Gold.
-- Copper Ore: 1 block → 2 Raw Copper.
-- Coal Ore: 1 block → 2 Coal.
-- Diamond Ore: 1 block → 2 Diamonds.
-- Emerald Ore: 1 block → 2 Emeralds.
-- Lapis Lazuli Ore: 1 block → 2 Lapis Lazuli.
-- Redstone Ore: 1 block → 2 Redstone Dust.
-- Nether Quartz Ore: 1 block → 2 Nether Quartz.
-- Ancient Debris: 1 block → 2 Ancient Debris (subject to progression and balance testing).
-- Every future AETHERIUM ore, including ores found in The Lost Realms, will receive a matching Grinder recipe.
+The machine uses an explicit recipe registry rather than guessing whether an arbitrary block is an ore. The initial registry includes:
 
-The table defines the initial design baseline, not final in-game balance. Vanilla ore drops that normally vary or produce multiple pieces may need individual tuning after playtesting; the intent is a clear 2× benefit without making progression trivial.
+- Aetherium Ore → 2 Raw Aetherium Crystals.
+- Iron, Gold and Copper ore variants (stone and deepslate) → 2 matching raw metal items.
+- Coal, Diamond, Emerald, Lapis Lazuli and Redstone ore variants → 2 matching drops.
+- Nether Gold Ore → 2 Gold Nuggets.
+- Nether Quartz Ore → 2 Nether Quartz.
+- Ancient Debris → 2 Netherite Scrap (progression and balance subject to in-game testing).
 
-## Compatibility with other add-ons
+The registry currently contains 22 explicit input mappings. Future AETHERIUM ores, including ores in The Lost Realms, will be added when their block and output identifiers are finalized.
 
-The Grinder will use a recipe registry. AETHERIUM ores are supported by default. Other add-ons can be supported by explicit compatibility entries that map an ore block identifier to its output item and count. Unknown blocks must not be treated as ores automatically; this avoids turning arbitrary blocks into valuable drops. Compatibility depends on the other add-on exposing stable identifiers and Bedrock allowing the required block/container interaction.
+### Third-party add-on compatibility
 
-## Machine behavior and safety
+Other add-ons can be supported through explicit compatibility entries mapping a block identifier to an output item and count. Unknown blocks are never processed automatically. Compatibility depends on stable identifiers and the Bedrock engine's supported block/container APIs.
 
-- The ore block is consumed only when the machine can fit the complete output in its output inventory.
-- If the output inventory is full, processing pauses; no items may be deleted.
-- Processing must not duplicate items if the world unloads, the player exits, or the server restarts.
-- The first prototype can be manually operated for functional testing; powered operation will connect to Aetherium Power later.
-- Upgrades may improve speed or add carefully balanced by-products; the basic 2× yield is the standard machine recipe.
+### Machine behavior and item safety
 
-## Bedrock implementation notes
+- Consume an input ore only when the complete output can fit.
+- Pause when output storage is full; never delete output.
+- Prevent duplication across world unloads, player exits and server restarts.
+- Start as a manually operated prototype; connect power and automation in later modules.
+- Upgrades may improve speed or add balanced by-products. The base yield remains configurable per recipe.
 
-A custom machine is not represented by a normal furnace recipe. The Grinder needs a custom block/container and Script API processing logic. The exact Script API dependency and container implementation must be verified against the minimum supported Bedrock release before shipping. Keep processing event-driven or on a bounded interval; do not scan every loaded block every tick.
+### Implementation constraints
 
-## Status
+A normal furnace recipe is not a real Grinder. The machine needs a supported custom block interaction, inventory/container UI and Script API processing. The exact API and persistence model must be verified against the declared minimum Bedrock version (currently 1.21.0) before implementation. Do not silently raise the minimum version or ship an unsupported schema. Avoid per-tick scans of every loaded block.
 
-This is the agreed gameplay specification, not an implemented or tested machine yet. Existing vanilla and AETHERIUM ore drops remain unchanged until the Grinder is functional in Bedrock.
+### Current status
+
+The JSON registry and static validation hook are present in the repository. The registry is design data only: no Grinder block, UI, inventory or runtime processor is implemented yet. Normal ore drops are unchanged. Automated tests and in-game behavior still need execution/verification.

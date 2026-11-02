@@ -35,7 +35,7 @@ The ore and raw-crystal now have separate original 16×16 pixel-art textures. Th
 
 ## Planned Industry processing
 
-The first planned machine is the universal Grinder. Its base rule is 1 supported ore block → 2 units of that ore's primary material (2× baseline). It will support vanilla ores, all AETHERIUM ores including The Lost Realms, and other add-ons through explicit compatibility recipes. The Grinder is not implemented yet; normal mining drops remain unchanged until its container and Script API processing have been tested in Bedrock. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
+The first planned machine is the universal Grinder. Its base rule is 1 supported ore block → 2 units of that ore's primary material (2× baseline). It will support vanilla ores, all AETHERIUM ores including The Lost Realms, and other add-ons through explicit compatibility recipes. The initial 22-entry Grinder recipe registry is stored in `behavior_pack/industry/grinder_recipes.json`, but it is not yet connected to a machine. The Grinder block, inventory UI and Script API processing are still unimplemented; normal mining drops remain unchanged. See [docs/INDUSTRY.md](docs/INDUSTRY.md).
 
 ## Planned modules
 
