@@ -265,8 +265,19 @@ def validate_content_references() -> None:
     # Every registered content entry must have a display name in every
     # language declared by the resource pack, not merely the current core set.
     language_files: dict[str, set[str]] = {}
-    languages = read_json("resource_pack/texts/languages.json")
-    language_codes = languages if isinstance(languages, list) else []
+    language_index = ROOT / "resource_pack/texts/languages.json"
+    language_codes: list[str] = []
+    if not language_index.is_file():
+        error("Missing localization index: resource_pack/texts/languages.json")
+    else:
+        try:
+            parsed_languages = json.loads(language_index.read_text(encoding="utf-8"))
+            if not isinstance(parsed_languages, list):
+                error("resource_pack/texts/languages.json: expected an array of language codes")
+            else:
+                language_codes = parsed_languages
+        except (OSError, json.JSONDecodeError) as exc:
+            error(f"Invalid resource_pack/texts/languages.json: {exc}")
     for code in language_codes:
         if not isinstance(code, str):
             continue
