@@ -41,3 +41,34 @@ The next implementation slice should be a minimal disposable entity prototype wi
 - the runtime can process one input transaction without loss or duplication.
 
 If the normal container UI cannot be opened for a custom entity on the target baseline, stop and evaluate a different supported interaction model rather than shipping a fake inventory.
+
+## Disposable probe test protocol
+
+The probe is a separate diagnostic asset, not a production machine. It must not be added to the normal crafting progression or advertised as a working Grinder until the following checks pass.
+
+### Client-side checks (Android)
+
+1. Create a new disposable Creative world and enable only the AETHERIUM packs required by the probe.
+2. Spawn the probe using its documented test command; confirm it renders with a clear, non-invisible model.
+3. Interact with it using the normal touch interaction. Record whether the vanilla container screen opens; do not accept a script dialog as equivalent.
+4. Move one harmless test item into and out of every exposed slot. Confirm stack splitting, merging, and drag/tap movement behave normally.
+5. Leave the area, return, and repeat. Then save, exit the world, reopen it, and verify the same inventory contents remain.
+6. Break/remove the probe and verify its inventory is not silently deleted or duplicated. The diagnostic instructions must state what happens to stored items.
+7. Repeat with two players if multiplayer access is intended; verify private/owner restrictions rather than assuming them.
+
+### Dedicated-server checks
+
+Repeat the persistence and interaction checks with a Bedrock Dedicated Server and an Android client connected to it. A successful local Creative-world test does not establish BDS compatibility.
+
+### Transaction checks before production integration
+
+- Verify the adapter reads and writes actual entity inventory slots synchronously.
+- Verify output capacity is checked before input consumption.
+- Simulate a failed output write, failed input write, and failed rollback.
+- Verify unload/reload and restart behavior around the processing boundary.
+- Confirm no processing callback can re-enter the same machine transaction.
+- Do not describe the in-memory rollback adapter as crash-proof: a process/world crash between separate inventory writes still requires a persistent journal or an engine-provided atomic operation.
+
+### Current automated coverage
+
+The engine-independent transaction adapter now returns storage_read_failed when a storage read throws, and its tests cover that path plus same-store re-entrant calls. These tests validate the adapter contract only; they do not validate Minecraft persistence, UI opening, or crash consistency.
