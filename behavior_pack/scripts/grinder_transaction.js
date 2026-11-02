@@ -3,6 +3,14 @@
 const { planGrind } = require("./grinder_processor.js");
 const activeStores = new WeakSet();
 
+function snapshotSlot(slot) {
+  return slot && typeof slot === "object" ? { ...slot } : slot;
+}
+
+function snapshotSlots(slots) {
+  return Array.isArray(slots) ? slots.map(snapshotSlot) : slots;
+}
+
 /**
  * Applies a planned grind through a synchronous storage adapter.
  *
@@ -12,9 +20,10 @@ const activeStores = new WeakSet();
  *   writeOutputs(slots) -> void
  *   writeInput(slot | null) -> void
  *
+ * Read values are copied before planning so adapters that expose live mutable
+ * slot objects cannot corrupt the rollback snapshots during a write.
  * Output is written before input is consumed. If either write throws, the
- * adapter attempts to restore both previous snapshots. Adapter writes should
- * be atomic per call where the engine guarantees that; this in-memory rollback
+ * adapter attempts to restore both previous snapshots. This in-memory rollback
  * is not crash-safe. Adapter methods must be synchronous; a Bedrock adapter
  * must not yield between these operations.
  */
@@ -35,8 +44,8 @@ function executeGrind(storage, recipeRegistry) {
     let inputBefore;
     let outputsBefore;
     try {
-      inputBefore = storage.readInput();
-      outputsBefore = storage.readOutputs();
+      inputBefore = snapshotSlot(storage.readInput());
+      outputsBefore = snapshotSlots(storage.readOutputs());
     } catch {
       return { ok: false, reason: "storage_read_failed" };
     }
@@ -47,7 +56,6 @@ function executeGrind(storage, recipeRegistry) {
       storage.writeOutputs(plan.outputAfter);
     } catch {
       // A storage adapter may fail after partially applying a multi-slot write.
-      // Restore the snapshot before returning; never assume a thrown write was atomic.
       try {
         storage.writeOutputs(outputsBefore);
         return { ok: false, reason: "output_write_failed_rolled_back" };
