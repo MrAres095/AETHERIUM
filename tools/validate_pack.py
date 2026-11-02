@@ -412,7 +412,17 @@ def validate_localization() -> None:
     if not isinstance(codes, list) or not codes:
         error(f"{relative}: expected a non-empty array of language codes")
         return
-    required = {"item.aetherium:crystal.name", "item.aetherium:raw_crystal.name", "item.aetherium:ingot.name", "tile.aetherium:crystal_block.name", "tile.aetherium:ore.name"}
+    if len(codes) != len(set(code for code in codes if isinstance(code, str))):
+        error(f"{relative}: duplicate language codes are not allowed")
+
+    required = {
+        "item.aetherium:crystal.name",
+        "item.aetherium:raw_crystal.name",
+        "item.aetherium:ingot.name",
+        "tile.aetherium:crystal_block.name",
+        "tile.aetherium:ore.name",
+    }
+    reference_keys: set[str] | None = None
     for code in codes:
         if not isinstance(code, str) or not re.fullmatch(r"[a-z]{2}_[A-Z]{2}", code):
             error(f"{relative}: invalid language code '{code}'")
@@ -421,17 +431,33 @@ def validate_localization() -> None:
         if not lang_path.is_file():
             error(f"Missing language file: {lang_path.relative_to(ROOT)}")
             continue
-        entries = {}
-        for line in lang_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
+        entries: dict[str, str] = {}
+        for line_number, raw_line in enumerate(lang_path.read_text(encoding="utf-8").splitlines(), 1):
+            line = raw_line.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            entries[key.strip()] = value.strip()
+            key, value = key.strip(), value.strip()
+            if not key:
+                error(f"{lang_path.relative_to(ROOT)}:{line_number}: translation key is empty")
+                continue
+            if key in entries:
+                error(f"{lang_path.relative_to(ROOT)}:{line_number}: duplicate translation key '{key}'")
+                continue
+            entries[key] = value
         for key in required:
             if not entries.get(key):
                 error(f"{lang_path.relative_to(ROOT)}: missing translation '{key}'")
-
+        current_keys = set(entries)
+        if reference_keys is None:
+            reference_keys = current_keys
+        elif current_keys != reference_keys:
+            missing = sorted(reference_keys - current_keys)
+            extra = sorted(current_keys - reference_keys)
+            if missing:
+                error(f"{lang_path.relative_to(ROOT)}: missing keys present in other languages: {', '.join(missing)}")
+            if extra:
+                error(f"{lang_path.relative_to(ROOT)}: keys not present in other languages: {', '.join(extra)}")
 
 def main() -> int:
     bp_path = "behavior_pack/manifest.json"
