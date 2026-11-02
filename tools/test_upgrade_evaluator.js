@@ -35,6 +35,11 @@ test("three Tier II modules unlock the advanced visual state", () => {
   ]);
   assert.equal(result.visualTier, 2);
   assert.equal(result.ultimateEffects, false);
+  assert.deepEqual(result.animation, {
+    rotationSpeedMultiplier: 1.5,
+    activeMechanisms: 1,
+    energyEffectLevel: 1,
+  });
   assert.equal(result.speedMultiplier, 1.25);
   assert.equal(result.yieldMultiplier, 1.25);
   assert.equal(result.energyMultiplier, 0.8);
@@ -48,6 +53,11 @@ test("three Tier III modules unlock ultimate performance and effects", () => {
   ]);
   assert.equal(result.visualTier, 3);
   assert.equal(result.ultimateEffects, true);
+  assert.deepEqual(result.animation, {
+    rotationSpeedMultiplier: 2.25,
+    activeMechanisms: 3,
+    energyEffectLevel: 2,
+  });
   assert.equal(result.speedMultiplier, 1.6);
   assert.equal(result.yieldMultiplier, 1.5);
   assert.equal(result.energyMultiplier, 0.65);
