@@ -13,11 +13,10 @@ const activeStores = new WeakSet();
  *   writeInput(slot | null) -> void
  *
  * Output is written before input is consumed. If either write throws, the
- * adapter attempts to restore the previous output snapshot. Adapter writes
- * should be atomic per call where the engine guarantees that; this in-memory
- * rollback is not crash-safe and cannot repair a partially committed input
- * write. Adapter methods must be synchronous; a Bedrock adapter must not yield
- * between these operations.
+ * adapter attempts to restore both previous snapshots. Adapter writes should
+ * be atomic per call where the engine guarantees that; this in-memory rollback
+ * is not crash-safe. Adapter methods must be synchronous; a Bedrock adapter
+ * must not yield between these operations.
  */
 function executeGrind(storage, recipeRegistry) {
   if (!storage || typeof storage !== "object" ||
@@ -60,12 +59,23 @@ function executeGrind(storage, recipeRegistry) {
     try {
       storage.writeInput(plan.inputAfter);
     } catch {
+      let inputRestored = false;
+      let outputsRestored = false;
+      try {
+        storage.writeInput(inputBefore);
+        inputRestored = true;
+      } catch {
+        // Keep attempting restoration of the other inventory side.
+      }
       try {
         storage.writeOutputs(outputsBefore);
-        return { ok: false, reason: "input_write_failed_rolled_back" };
+        outputsRestored = true;
       } catch {
-        return { ok: false, reason: "rollback_failed" };
+        // The caller receives an explicit failure if either side did not restore.
       }
+      return inputRestored && outputsRestored
+        ? { ok: false, reason: "input_write_failed_rolled_back" }
+        : { ok: false, reason: "rollback_failed" };
     }
 
     return { ok: true, produced: plan.produced };
