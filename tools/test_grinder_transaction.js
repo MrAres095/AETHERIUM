@@ -149,9 +149,14 @@ test("copies live adapter snapshots before writes can mutate them", () => {
 test("copies the live input snapshot before a partial input write", () => {
   const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 2 }, [null]);
   store.readInput = () => store.input;
+  let writes = 0;
   store.writeInput = value => {
-    store.input.amount = value.amount;
-    throw new Error("partial input write after mutating live input");
+    writes += 1;
+    if (writes === 1) {
+      store.input.amount = value.amount;
+      throw new Error("partial input write after mutating live input");
+    }
+    store.input = value && { ...value };
   };
 
   const result = executeGrind(store, recipes);
