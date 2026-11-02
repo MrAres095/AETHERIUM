@@ -33,8 +33,11 @@ function cloneSlot(slot) {
 
 /** Validate every mapping, not only the mapping selected by this input. */
 function validateRecipeRegistry(registry) {
-  if (!registry || !Array.isArray(registry.recipes) || registry.recipes.length === 0) {
+  if (!registry || !Array.isArray(registry.recipes)) {
     return "invalid_inventory_or_registry";
+  }
+  if (registry.recipes.length === 0) {
+    return "invalid_recipe_registry";
   }
 
   const seenInputs = new Set();
