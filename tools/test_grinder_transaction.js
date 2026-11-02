@@ -81,11 +81,36 @@ test("reports when a partially failed output write cannot be rolled back", () =>
   assert.equal(store.outputs[0].amount, 1);
 });
 
-test("rolls output back if input consumption fails", () => {
+test("restores both snapshots when input commit fails before mutation", () => {
   const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
-  store.failInputWrite = true;
+  let writes = 0;
+  const original = store.writeInput.bind(store);
+  store.writeInput = value => {
+    writes += 1;
+    if (writes === 1) throw new Error("simulated input write failure");
+    original(value);
+  };
   assert.equal(executeGrind(store, recipes).reason, "input_write_failed_rolled_back");
   assert.equal(store.input.amount, 1);
+  assert.equal(store.outputs[0], null);
+});
+
+test("restores input and output when input write partially mutates then throws", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 2 }, [null]);
+  let writes = 0;
+  const original = store.writeInput.bind(store);
+  store.writeInput = value => {
+    writes += 1;
+    if (writes === 1) {
+      store.input = value && { ...value };
+      throw new Error("simulated partial input write");
+    }
+    original(value);
+  };
+
+  const result = executeGrind(store, recipes);
+  assert.equal(result.reason, "input_write_failed_rolled_back");
+  assert.deepEqual(store.input, { typeId: "minecraft:iron_ore", amount: 2 });
   assert.equal(store.outputs[0], null);
 });
 
