@@ -49,7 +49,6 @@ test("does not change storage if output write fails", () => {
   assert.equal(store.outputs[0], null);
 });
 
-
 test("restores the output snapshot when a multi-slot output write partially fails", () => {
   const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null, null]);
   let writes = 0;
@@ -125,6 +124,21 @@ test("reports rollback failure instead of claiming a safe commit", () => {
     original(value);
   };
   assert.equal(executeGrind(store, recipes).reason, "rollback_failed");
+});
+
+test("copies live adapter snapshots before writes can mutate them", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
+  store.readInput = () => store.input;
+  store.readOutputs = () => store.outputs;
+  store.writeOutputs = () => {
+    store.outputs[0] = { typeId: "minecraft:raw_iron", amount: 2 };
+    throw new Error("partial write after mutating live output");
+  };
+
+  const result = executeGrind(store, recipes);
+  assert.equal(result.reason, "output_write_failed_rolled_back");
+  assert.equal(store.input.amount, 1);
+  assert.deepEqual(store.outputs, [null]);
 });
 
 test("rejects invalid adapters and full output storage", () => {
