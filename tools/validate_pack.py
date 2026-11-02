@@ -262,6 +262,29 @@ def validate_content_references() -> None:
     item_keys = set(item_atlas.get("texture_data", {}))
     terrain_keys = set(terrain_atlas.get("texture_data", {}))
 
+    # Every registered content entry must have a display name in every
+    # language declared by the resource pack, not merely the current core set.
+    language_files: dict[str, set[str]] = {}
+    languages = read_json("resource_pack/texts/languages.json")
+    language_codes = languages if isinstance(languages, list) else []
+    for code in language_codes:
+        if not isinstance(code, str):
+            continue
+        lang_path = ROOT / "resource_pack/texts" / f"{code}.lang"
+        if not lang_path.is_file():
+            continue
+        keys: set[str] = set()
+        for raw_line in lang_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                keys.add(line.split("=", 1)[0].strip())
+        language_files[code] = keys
+
+    def require_translation(key: str, source: str) -> None:
+        for code in language_codes:
+            if isinstance(code, str) and code in language_files and key not in language_files[code]:
+                error(f"{source}: missing localization '{key}' in {code}.lang")
+
     for path in sorted((ROOT / "behavior_pack/items").glob("*.json")):
         relative = path.relative_to(ROOT).as_posix()
         data = read_json(relative)
@@ -273,13 +296,24 @@ def validate_content_references() -> None:
             icon = icon.get("texture")
         if not isinstance(icon, str) or icon not in item_keys:
             error(f"{relative}: item icon '{icon}' is missing from item_texture.json")
+        display_name = components.get("minecraft:display_name", {})
+        translation_key = display_name.get("value") if isinstance(display_name, dict) else None
+        if not isinstance(translation_key, str) or not translation_key:
+            error(f"{relative}: item is missing minecraft:display_name.value")
+        else:
+            require_translation(translation_key, relative)
 
     for path in sorted((ROOT / "behavior_pack/blocks").glob("*.json")):
         relative = path.relative_to(ROOT).as_posix()
         data = read_json(relative)
         if not data:
             continue
-        components = data.get("minecraft:block", {}).get("components", {})
+        block = data.get("minecraft:block", {})
+        description = block.get("description", {}) if isinstance(block, dict) else {}
+        identifier = description.get("identifier") if isinstance(description, dict) else None
+        if isinstance(identifier, str) and re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+", identifier):
+            require_translation(f"tile.{identifier}.name", relative)
+        components = block.get("components", {}) if isinstance(block, dict) else {}
         instances = components.get("minecraft:material_instances", {})
         if isinstance(instances, dict):
             for slot, material in instances.items():
