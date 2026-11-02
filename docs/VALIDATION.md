@@ -43,3 +43,8 @@ A passing script does not certify that Minecraft accepts every component or form
 10. Load the same pack on the target Bedrock Dedicated Server and verify that clients see the same content.
 
 Record the exact Bedrock version, platform, experiment settings, test date, and outcome before marking a feature as tested.
+
+
+## Grinder registry
+
+`behavior_pack/industry/grinder_recipes.json` is a design-time recipe registry. `validate_grinder_registry()` checks identifiers, duplicate inputs and positive output counts. Passing static validation does not mean the runtime machine exists or that the Bedrock engine accepts its eventual UI/container schema.

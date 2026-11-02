@@ -43,3 +43,8 @@ Avoid assuming Java Edition mod-loader features exist in Bedrock. Every proposed
 ## Current scope
 
 The initial milestone is only a minimal importable behavior pack and a repeatable smoke test. The architecture above is the intended direction, not a claim that these systems already exist.
+
+
+## Grinder runtime architecture decision
+
+The universal Grinder recipe registry is independent from its future machine UI and storage implementation. Because the project currently targets Bedrock 1.21.0, do not assume experimental custom block containers are available as a stable feature. The first runtime prototype should investigate an entity-backed inventory/display adapter while retaining a block-like machine appearance. A block-hosted container may replace that adapter only after stable Android and BDS compatibility is demonstrated. Keep processing transactional and persistent; never consume input unless the complete output can be committed safely.

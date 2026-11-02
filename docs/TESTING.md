@@ -56,3 +56,8 @@ The current custom feature/feature-rule approach may require the **Creation of C
 - Record the exact Minecraft version, platform, experiment settings, and test result.
 
 Repository-side checks do not replace testing in the actual Bedrock engine. The current 0.3.3 prototype has not yet been confirmed inside Minecraft.
+
+
+## Grinder compatibility test matrix
+
+Before calling the Grinder complete, verify: (1) supported Bedrock 1.21.0 target or explicitly documented minimum-version change; (2) Android client interaction and inventory; (3) Bedrock Dedicated Server operation; (4) output-full pause without item loss; (5) no duplication after chunk unload, player exit, world restart or server restart; (6) every registered ore mapping produces the declared output; (7) unknown blocks are rejected.

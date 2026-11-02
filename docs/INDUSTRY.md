@@ -29,9 +29,15 @@ Other add-ons can be supported through explicit compatibility entries mapping a 
 - Start as a manually operated prototype; connect power and automation in later modules.
 - Upgrades may improve speed or add balanced by-products. The base yield remains configurable per recipe.
 
-### Implementation constraints
+### Implementation constraints and compatibility decision
 
-A normal furnace recipe is not a real Grinder. The machine needs a supported custom block interaction, inventory/container UI and Script API processing. The exact API and persistence model must be verified against the declared minimum Bedrock version (currently 1.21.0) before implementation. Do not silently raise the minimum version or ship an unsupported schema. Avoid per-tick scans of every loaded block.
+A normal furnace recipe is not a real Grinder. The machine needs a supported interaction, inventory/container UI and Script API processing.
+
+The current minimum engine target is 1.21.0. The official Script API exposes block inventory access for blocks that actually have an inventory component, but that API alone does not prove a custom block can declare a persistent container in every target release. Current block custom-component documentation also spans API/schema generations; newer flattened custom-component examples require newer format support. Experimental custom block containers are not an acceptable stable baseline for this project.
+
+Implementation decision: do not raise the minimum engine version silently and do not ship an experimental block-container dependency. Prototype the machine using a supported entity-backed inventory/display approach first, with the machine rendered to look like a placed industrial block. Re-evaluate a true block-hosted container only after confirming it is stable on Android and BDS at the selected minimum version. Keep the recipe processor independent from the UI/storage adapter so the backend can be changed without rewriting recipes.
+
+The runtime must use an explicit transaction: validate input and full output capacity, write output, then commit input consumption with rollback/error handling where the API permits. Persist machine state and guard against duplicate processing across unload/restart. Avoid per-tick scans of every loaded block.
 
 ### Current status
 

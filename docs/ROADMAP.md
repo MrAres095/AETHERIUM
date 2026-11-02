@@ -38,7 +38,10 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [x] Include vanilla ore mappings and Aetherium Ore in the explicit registry
 - [x] Reserve future AETHERIUM/The Lost Realms ore support for finalized identifiers
 - [x] Define an explicit compatibility registry for other add-ons
-- [ ] Add Grinder block, inventory/container, and original textures
+- [ ] Verify stable inventory/container options against Bedrock 1.21.0 on Android and BDS
+- [ ] Prototype entity-backed Grinder inventory/display without experimental block containers
+- [ ] Add Grinder machine appearance, interaction and inventory UI
+- [ ] Implement persistent, transactional recipe processing
 - [x] Add initial JSON ore-to-output registry and static validation
 - [ ] Connect the registry to the actual Grinder runtime
 - [ ] Implement safe input/output processing with no item loss or duplication
