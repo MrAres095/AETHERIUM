@@ -122,3 +122,40 @@ test("leaves input and output unchanged when an output cannot fully fit", () => 
   assert.equal(input.amount, 1);
   assert.equal(outputs[0].amount, 63);
 });
+
+
+test("rejects a malformed unrelated recipe instead of silently ignoring the registry error", () => {
+  const badRegistry = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron", count: 2 },
+    { input: "minecraft:gold_ore", output: "not-an-item-id", count: 2 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], badRegistry,
+  ).reason, "invalid_recipe_registry");
+});
+
+test("rejects duplicate mappings even when the duplicate is not the selected input", () => {
+  const badRegistry = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron", count: 2 },
+    { input: "minecraft:gold_ore", output: "minecraft:raw_gold", count: 2 },
+    { input: "minecraft:gold_ore", output: "minecraft:gold_ingot", count: 1 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], badRegistry,
+  ).reason, "ambiguous_recipe");
+});
+
+test("rejects an empty recipe registry", () => {
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], { recipes: [] },
+  ).reason, "invalid_recipe_registry");
+});
+
+test("does not accept a recipe output stack limit above the engine-safe default", () => {
+  const badRegistry = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron", count: 2, max_stack_size: 65 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], badRegistry,
+  ).reason, "invalid_recipe_registry");
+});
