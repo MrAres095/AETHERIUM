@@ -11,6 +11,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
+ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+
+
+def write_reproducible_member(archive: zipfile.ZipFile, name: str, data: bytes) -> None:
+    info = zipfile.ZipInfo(name, date_time=ZIP_TIMESTAMP)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.create_system = 3
+    info.external_attr = 0o100644 << 16
+    archive.writestr(info, data, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
 
 def read_manifest(pack: Path) -> dict:
@@ -21,10 +30,14 @@ def read_manifest(pack: Path) -> dict:
 
 def make_mcpack(pack: Path) -> bytes:
     buffer = BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(pack.rglob("*")):
-            if path.is_file():
-                archive.write(path, path.relative_to(pack).as_posix())
+            if path.is_file() and not path.is_symlink():
+                write_reproducible_member(
+                    archive,
+                    path.relative_to(pack).as_posix(),
+                    path.read_bytes(),
+                )
     return buffer.getvalue()
 
 
@@ -48,9 +61,9 @@ def main() -> int:
     output = DIST / f"AETHERIUM-{version_text}.mcaddon"
     DIST.mkdir(parents=True, exist_ok=True)
 
-    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as addon:
-        addon.writestr("AETHERIUM-Behavior.mcpack", make_mcpack(bp))
-        addon.writestr("AETHERIUM-Resources.mcpack", make_mcpack(rp))
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as addon:
+        write_reproducible_member(addon, "AETHERIUM-Behavior.mcpack", make_mcpack(bp))
+        write_reproducible_member(addon, "AETHERIUM-Resources.mcpack", make_mcpack(rp))
 
     with zipfile.ZipFile(output, "r") as addon:
         bad_member = addon.testzip()
