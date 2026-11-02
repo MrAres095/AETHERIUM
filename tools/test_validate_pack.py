@@ -193,8 +193,8 @@ class ValidatorTests(unittest.TestCase):
             json.dumps(["en_US"]), encoding="utf-8"
         )
         (self.root / "resource_pack/texts/en_US.lang").write_text(
-            "item.aetherium:crystal.name=Crystal\\n"
-            "item.aetherium:crystal.name=Duplicate\\n",
+            "item.aetherium:crystal.name=Crystal\n"
+            "item.aetherium:crystal.name=Duplicate\n",
             encoding="utf-8",
         )
         validator.validate_localization()
@@ -214,9 +214,9 @@ class ValidatorTests(unittest.TestCase):
             "tile.aetherium:crystal_block.name",
             "tile.aetherium:ore.name",
         ]
-        english = "\\n".join(f"{key}=English" for key in required)
-        croatian = "\\n".join(f"{key}=Croatian" for key in required[:-1])
-        (texts / "en_US.lang").write_text(english + "\\nitem.extra=Extra\\n", encoding="utf-8")
+        english = "\n".join(f"{key}=English" for key in required)
+        croatian = "\n".join(f"{key}=Croatian" for key in required[:-1])
+        (texts / "en_US.lang").write_text(english + "\nitem.extra=Extra\n", encoding="utf-8")
         (texts / "hr_HR.lang").write_text(croatian, encoding="utf-8")
         validator.validate_localization()
         self.assertTrue(any("missing keys present in other languages" in message
