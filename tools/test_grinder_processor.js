@@ -75,3 +75,50 @@ test("splits large recipe output across multiple empty slots", () => {
   assert.equal(result.ok, true);
   assert.deepEqual(result.outputAfter.map(slot => slot.amount), [64, 64, 2]);
 });
+
+test("rejects malformed output stacks instead of planning against them", () => {
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 },
+    [{ typeId: "minecraft:raw_iron", amount: 65, maxAmount: 64 }],
+    registry,
+  ).reason, "invalid_output_inventory");
+});
+
+test("rejects duplicate recipe mappings as ambiguous", () => {
+  const ambiguous = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron", count: 2 },
+    { input: "minecraft:iron_ore", output: "minecraft:iron_ingot", count: 1 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], ambiguous,
+  ).reason, "ambiguous_recipe");
+});
+
+test("honors a recipe-specific stack limit", () => {
+  const singleStack = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:bucket", count: 2, max_stack_size: 1 },
+  ] };
+  const result = planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null, null], singleStack,
+  );
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.outputAfter.map(slot => slot.amount), [1, 1]);
+});
+
+test("rejects a recipe with an invalid stack limit", () => {
+  const bad = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron", count: 2, max_stack_size: 0 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], bad,
+  ).reason, "invalid_recipe");
+});
+
+test("leaves input and output unchanged when an output cannot fully fit", () => {
+  const input = { typeId: "minecraft:iron_ore", amount: 1 };
+  const outputs = [{ typeId: "minecraft:raw_iron", amount: 63 }, { typeId: "minecraft:stone", amount: 64 }];
+  const result = planGrind(input, outputs, registry);
+  assert.equal(result.reason, "output_full");
+  assert.equal(input.amount, 1);
+  assert.equal(outputs[0].amount, 63);
+});
