@@ -111,7 +111,7 @@ test("rejects a recipe with an invalid stack limit", () => {
   ] };
   assert.equal(planGrind(
     { typeId: "minecraft:iron_ore", amount: 1 }, [null], bad,
-  ).reason, "invalid_recipe");
+  ).reason, "invalid_recipe_registry");
 });
 
 test("leaves input and output unchanged when an output cannot fully fit", () => {
