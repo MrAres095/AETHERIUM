@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "description": "Shared machine catalogue for the single integrated AETHERIUM add-on.",
+  "machines": [
+    {
+      "id": "aetherium:manual_grinder",
+      "family": "aetherium:grinder",
+      "mode": "manual",
+      "powered": false,
+      "input_slots": 1,
+      "output_slots": 3,
+      "upgrade_slots": [],
+      "recipe_registry": "behavior_pack/industry/grinder_recipes.json"
+    },
+    {
+      "id": "aetherium:electric_grinder",
+      "family": "aetherium:grinder",
+      "mode": "electric",
+      "powered": true,
+      "input_slots": 1,
+      "output_slots": 3,
+      "upgrade_slots": [
+        "speed",
+        "yield",
+        "energy"
+      ],
+      "recipe_registry": "behavior_pack/industry/grinder_recipes.json"
+    }
+  ]
+}
