@@ -1,0 +1,18 @@
+{
+  "format_version": "1.17.0",
+  "minecraft:ore_feature": {
+    "description": {
+      "identifier": "aetherium:aetherium_nether_ore_feature"
+    },
+    "count": 7,
+    "discard_chance_on_air_exposure": 0.35,
+    "replace_rules": [
+      {
+        "places_block": "aetherium:ore",
+        "may_replace": [
+          "minecraft:netherrack"
+        ]
+      }
+    ]
+  }
+}
