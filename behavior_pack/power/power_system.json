@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "energy_unit": "AEU",
+  "battery_tiers": [
+    {
+      "tier": 1,
+      "capacity": 100000,
+      "max_input_per_tick": 500,
+      "max_output_per_tick": 500
+    },
+    {
+      "tier": 2,
+      "capacity": 500000,
+      "max_input_per_tick": 2500,
+      "max_output_per_tick": 2500
+    },
+    {
+      "tier": 3,
+      "capacity": 2500000,
+      "max_input_per_tick": 10000,
+      "max_output_per_tick": 10000
+    }
+  ],
+  "wireless": {
+    "segment_length_blocks": 16,
+    "relay_requires_real_energy_storage": true,
+    "same_dimension_only": true,
+    "line_of_sight_required": true,
+    "energy_loss_percent_per_segment": 5,
+    "chunk_loading_is_separate": true
+  },
+  "handheld_tools": {
+    "battery_required": true,
+    "stop_at_zero_charge": true,
+    "charging_station": "aetherium:charging_station"
+  }
+}

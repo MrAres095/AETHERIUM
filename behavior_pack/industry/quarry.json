@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "id": "aetherium:quarry",
+  "powered": true,
+  "area_selection": {
+    "marker_item": "minecraft:redstone_torch",
+    "corner_count": 4,
+    "shape": "rectangle",
+    "preview_before_start": true,
+    "confirm_before_build": true,
+    "build_perimeter_frame": true
+  },
+  "mining": {
+    "bounded_blocks_per_tick": 4,
+    "collect_actual_block_drops": true,
+    "unknown_blocks": "skip_and_report",
+    "replacement_modes": [
+      "none",
+      "backfill",
+      "replace"
+    ],
+    "default_replacement_mode": "none",
+    "replacement_requires_explicit_safe_block": true,
+    "never_replace_containers_or_machine_blocks": true
+  },
+  "output": {
+    "early_game": [
+      "chest",
+      "aetherium:logistics_pipe"
+    ],
+    "future_optional_bridge": "ae2",
+    "categories": [
+      "ores",
+      "building_materials",
+      "special_resources",
+      "other"
+    ],
+    "pause_when_output_full": true,
+    "never_void_drops": true
+  },
+  "chunk_loading": {
+    "separate_optional_device": true,
+    "must_respect_bedrock_ticking_area_limits": true,
+    "world_closed_background_work_guaranteed": false
+  }
+}
