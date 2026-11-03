@@ -7,7 +7,7 @@ The 0.3.3 development prototype contains:
 - Aetherium Ore, which is intended to generate in underground Overworld stone/deepslate.
 - Raw Aetherium Crystal dropped by the ore.
 - Aetherium Ingot, smelted from Raw Aetherium Crystal in a furnace or blast furnace.
-- English and Croatian names for the new content.
+- English-only names for the new content, regardless of the Minecraft client language.
 - A test-kit function that supplies sample items and blocks.
 
 Ore generation makes 8 placement attempts per chunk. Each feature attempt has a configured vein size of 7 blocks (up from 5). The actual visible number of blocks can be lower due to air-exposure discard and replacement rules, so this must be measured in-game.
@@ -31,7 +31,7 @@ The current custom feature/feature-rule approach may require the **Creation of C
 7. Put Raw Aetherium Crystal into a furnace and blast furnace; confirm it produces Aetherium Ingot. Check that the recipe is not available in smokers or campfires.
 8. Locate Aetherium Ore in newly generated underground Overworld terrain, including stone and deepslate areas. Record how often it appears during a fixed exploration route and whether veins reach the intended size of 7.
 9. Mine the ore and confirm it drops Raw Aetherium Crystal.
-10. Check the Creative inventory names in English and Croatian.
+10. Check that Creative inventory names appear in English while Minecraft is set to a non-English language.
 11. Check the Content Log for feature, feature-rule, block, loot-table, texture, and manifest errors.
 
 ## Pass criteria
