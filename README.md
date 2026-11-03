@@ -24,7 +24,7 @@ A modular, original technology-and-adventure add-on for Minecraft Bedrock Editio
 - `aetherium:ingot` – refined in a furnace or blast furnace from Raw Aetherium Crystal.
 - Feature and feature-rule definitions distribute ore in underground Overworld stone/deepslate.
 - Ore placement attempts per chunk: 8; each generated vein has a configured size of up to 7 ore blocks.
-- English and Croatian localization for the current content.
+- English-only localization for all players, regardless of the Minecraft client language.
 - A test-kit function supplies the current prototype resources.
 
 The refining recipe uses Bedrock's data-driven furnace recipe system. The ingot has its own original 16×16 pixel-art texture.
