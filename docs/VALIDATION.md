@@ -38,7 +38,7 @@ A passing script does not certify that Minecraft accepts every component or form
 4. Generate fresh Overworld chunks and explore underground between Y -32 and Y 24.
 5. Confirm Aetherium Ore appears in stone/deepslate and drops Raw Aetherium Crystal.
 6. Run `/function aetherium/core/test` and `/function aetherium/core/test_kit`.
-7. Confirm English and Croatian names.
+7. Confirm all AETHERIUM names appear in English, even when Minecraft is set to another language.
 8. Check the Content Log for feature, feature-rule, block, loot, and manifest errors.
 9. Repeat on Android and Windows Bedrock.
 10. Load the same pack on the target Bedrock Dedicated Server and verify that clients see the same content.
