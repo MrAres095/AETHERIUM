@@ -243,3 +243,10 @@ Before a due transfer cycle, the logistics orchestrator now reads the live buffe
 The engine-independent logistics state module now defines a versioned drop-payload contract. A break-event adapter can serialize the machine identifier, configuration and nine-slot buffer into a bounded payload for the dropped machine item; a placement adapter can validate and restore it. Restoration rejects malformed or oversized data, unsupported payload versions, and payloads applied to the wrong machine type. The embedded state is validated again before it is returned.
 
 This is a data contract only. It does not yet attach custom data to a Bedrock item, intercept block break/place events, or delete/reconcile world storage. The runtime adapter must write the payload to the dropped item successfully before clearing the block's saved state, and must consume/clear the payload exactly once after successful placement. Until that adapter and its crash-recovery behavior are implemented and tested in-game, machine contents are not yet guaranteed to survive breaking or moving the block.
+
+
+### Logistics break/place lifecycle hand-off
+
+The engine-independent `logistics_lifecycle.js` module now defines the required adapter ordering for moving a machine's saved state into its dropped item and restoring it on placement. Breaking stages the payload on the dropped item before clearing machine storage; a failed storage clear attempts to remove the staged payload and reports when compensation itself fails. Placement validates the payload and machine type, writes the restored state first, and only then consumes the payload. Adapter failures are returned as explicit recovery/reconciliation states rather than reported as successful transfers.
+
+Seven tests cover operation ordering, write failures, compensation, wrong-machine payloads and placement reconciliation. This is still an adapter contract, not Bedrock event integration. The eventual runtime must provide durable item custom data and machine storage, enforce single-use placement/recovery, and test interruption/crash cases in a real world before item preservation can be guaranteed.
