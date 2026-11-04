@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "energy_unit": "AEU",
+  "initial_generators": [
+    {"id": "aetherium:steam_generator", "tier": "early", "fuelled": true, "requires_water_loop": true},
+    {"id": "aetherium:wind_turbine", "tier": "early", "fuelled": false},
+    {"id": "aetherium:solar_generator", "tier": "early", "fuelled": false}
+  ],
+  "steam_plant": {
+    "stages": ["aetherium:wood_cutter", "aetherium:boiler", "aetherium:steam_turbine", "aetherium:condenser", "aetherium:water_pump"],
+    "water_cycle": {
+      "type": "closed_loop",
+      "initial_fill_required": true,
+      "consumes_water_during_steady_operation": false,
+      "stages": ["pump_to_boiler", "boiler_heats_water", "steam_drives_turbine", "condenser_returns_water", "pump_recirculates"],
+      "pump_drive": "mechanical_turbine_shaft",
+      "startup": "manual_hand_crank",
+      "leak_behavior": "stop_and_report",
+      "never_create_water_from_nothing": true
+    },
+    "boiler": {
+      "id": "aetherium:boiler",
+      "accepted_fuels": ["minecraft:coal", "minecraft:charcoal", "minecraft:coal_block", "minecraft:oak_log", "minecraft:spruce_log", "minecraft:birch_log", "minecraft:jungle_log", "minecraft:acacia_log", "minecraft:dark_oak_log", "minecraft:mangrove_log", "minecraft:cherry_log", "minecraft:crimson_stem", "minecraft:warped_stem", "aetherium:wood_chips"],
+      "preferred_processed_fuel": "minecraft:charcoal",
+      "accepts_wood_chips": true,
+      "fuel_consumed_only_while_heating": true,
+      "overheat_protection": true,
+      "dry_boiler_must_stop": true
+    },
+    "turbine": {
+      "id": "aetherium:steam_turbine",
+      "produces": "AEU",
+      "requires_steam_pressure": true,
+      "gross_output_must_exceed_internal_loads": true,
+      "no_energy_from_idle_or_cold_state": true
+    },
+    "condenser": {
+      "id": "aetherium:condenser",
+      "returns_steam_to_water": true,
+      "requires_cooling": true,
+      "cooling_options": ["ambient_air", "water_cooling_upgrade"],
+      "output_must_feed_closed_loop": true
+    },
+    "pump": {
+      "id": "aetherium:water_pump",
+      "moves_existing_water_only": true,
+      "requires_valid_pipe_connection": true,
+      "startup_crank_required": true,
+      "steady_drive": "mechanical_turbine_shaft",
+      "cannot_generate_power": true
+    }
+  }
+}
