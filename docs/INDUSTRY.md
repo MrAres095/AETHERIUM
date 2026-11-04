@@ -175,3 +175,17 @@ An engine-independent transaction prototype now exists at `behavior_pack/scripts
 The Item Extractor and Item Inserter now have separate shaped crafting recipes. The Extractor uses an Aetherium Ingot as its core, with Iron Ingots and Redstone around it. The Inserter uses an Aetherium Crystal core with Iron Ingots and a Redstone circuit pattern. Both are registered as crafting-table recipes and return their corresponding placed machine block.
 
 Static recipe validation explicitly allows the small documented vanilla ingredient set (currently Iron Ingot and Redstone), while still requiring every AETHERIUM ingredient and every recipe output to be registered. This is a pack-integrity check only; recipe discovery and crafting still need verification in the Bedrock client.
+
+
+
+### Logistics machine configuration foundation
+
+The engine-independent module `behavior_pack/scripts/logistics_config.js` now defines the shared configuration contract for both machines:
+
+- All six adjacent faces are supported (north, south, east, west, up and down), each mapped to exactly one neighboring block.
+- Whitelist and blacklist item filters accept namespaced Bedrock identifiers only and reject duplicates.
+- Transfer cadence is configurable from 1 to 1,200 ticks; per-cycle limits are capped at 16 source stacks and 256 items.
+- Invalid settings are rejected instead of silently rewritten. Returned configuration is detached from caller-owned arrays.
+- A deterministic tick scheduler checks whether an enabled machine is due to run; it does not create timers or depend on engine globals.
+
+The configuration and scheduler are unit-tested and included in both CI workflows. This is the shared rules layer only: player-facing face/filter UI, saving settings to block-entity/world dynamic properties, and the actual Bedrock inventory adapter still need runtime integration and in-game testing.
