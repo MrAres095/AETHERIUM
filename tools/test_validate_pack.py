@@ -69,6 +69,23 @@ class ValidatorTests(unittest.TestCase):
         validator.validate_recipes({"aetherium:crystal", "aetherium:crystal_block"})
         self.assertEqual(validator.ERRORS, [])
 
+    def test_valid_shaped_recipe_accepts_explicit_vanilla_ingredients(self):
+        self.write_json("behavior_pack/recipes/test.json", {
+            "format_version": "1.20.10",
+            "minecraft:recipe_shaped": {
+                "description": {"identifier": "aetherium:test_vanilla_recipe"},
+                "tags": ["crafting_table"],
+                "pattern": ["IR"],
+                "key": {
+                    "I": {"item": "minecraft:iron_ingot"},
+                    "R": {"item": "minecraft:redstone"},
+                },
+                "result": {"item": "aetherium:crystal", "count": 1},
+            },
+        })
+        validator.validate_recipes({"aetherium:crystal"})
+        self.assertEqual(validator.ERRORS, [])
+
     def test_unknown_recipe_ingredient_is_reported(self):
         self.write_json("behavior_pack/recipes/test.json", {
             "minecraft:recipe_shapeless": {
