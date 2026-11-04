@@ -3,17 +3,42 @@
   "status": "design_only",
   "energy_unit": "AEU",
   "initial_generators": [
-    {"id": "aetherium:steam_generator", "tier": "early", "fuelled": true, "requires_water_loop": true},
-    {"id": "aetherium:wind_turbine", "tier": "early", "fuelled": false},
-    {"id": "aetherium:solar_generator", "tier": "early", "fuelled": false}
+    {
+      "id": "aetherium:steam_generator",
+      "tier": "early",
+      "fuelled": true,
+      "requires_water_loop": true
+    },
+    {
+      "id": "aetherium:wind_turbine",
+      "tier": "early",
+      "fuelled": false
+    },
+    {
+      "id": "aetherium:solar_generator",
+      "tier": "early",
+      "fuelled": false
+    }
   ],
   "steam_plant": {
-    "stages": ["aetherium:wood_cutter", "aetherium:boiler", "aetherium:steam_turbine", "aetherium:condenser", "aetherium:water_pump"],
+    "stages": [
+      "aetherium:wood_cutter",
+      "aetherium:boiler",
+      "aetherium:steam_turbine",
+      "aetherium:condenser",
+      "aetherium:water_pump"
+    ],
     "water_cycle": {
       "type": "closed_loop",
       "initial_fill_required": true,
       "consumes_water_during_steady_operation": false,
-      "stages": ["pump_to_boiler", "boiler_heats_water", "steam_drives_turbine", "condenser_returns_water", "pump_recirculates"],
+      "stages": [
+        "pump_to_boiler",
+        "boiler_heats_water",
+        "steam_drives_turbine",
+        "condenser_returns_water",
+        "pump_recirculates"
+      ],
       "pump_drive": "mechanical_turbine_shaft",
       "startup": "manual_hand_crank",
       "leak_behavior": "stop_and_report",
@@ -21,7 +46,22 @@
     },
     "boiler": {
       "id": "aetherium:boiler",
-      "accepted_fuels": ["minecraft:coal", "minecraft:charcoal", "minecraft:coal_block", "minecraft:oak_log", "minecraft:spruce_log", "minecraft:birch_log", "minecraft:jungle_log", "minecraft:acacia_log", "minecraft:dark_oak_log", "minecraft:mangrove_log", "minecraft:cherry_log", "minecraft:crimson_stem", "minecraft:warped_stem", "aetherium:wood_chips"],
+      "accepted_fuels": [
+        "minecraft:coal",
+        "minecraft:charcoal",
+        "minecraft:coal_block",
+        "minecraft:oak_log",
+        "minecraft:spruce_log",
+        "minecraft:birch_log",
+        "minecraft:jungle_log",
+        "minecraft:acacia_log",
+        "minecraft:dark_oak_log",
+        "minecraft:mangrove_log",
+        "minecraft:cherry_log",
+        "minecraft:crimson_stem",
+        "minecraft:warped_stem",
+        "aetherium:wood_chips"
+      ],
       "preferred_processed_fuel": "minecraft:charcoal",
       "accepts_wood_chips": true,
       "fuel_consumed_only_while_heating": true,
@@ -39,7 +79,10 @@
       "id": "aetherium:condenser",
       "returns_steam_to_water": true,
       "requires_cooling": true,
-      "cooling_options": ["ambient_air", "water_cooling_upgrade"],
+      "cooling_options": [
+        "ambient_air",
+        "water_cooling_upgrade"
+      ],
       "output_must_feed_closed_loop": true
     },
     "pump": {
@@ -49,6 +92,21 @@
       "startup_crank_required": true,
       "steady_drive": "mechanical_turbine_shaft",
       "cannot_generate_power": true
+    },
+    "output_balance": {
+      "target_gross_generation_per_tick": 900,
+      "internal_plant_load_per_tick": 100,
+      "net_available_per_tick": 800,
+      "supported_continuous_machine_loads": 2,
+      "target_machine_load_each_per_tick": 150,
+      "combined_machine_load_per_tick": 300,
+      "target_surplus_for_battery_per_tick": 500,
+      "tier_1_battery_capacity": 100000,
+      "tier_1_battery_max_input_per_tick": 500,
+      "tier_1_battery_fill_ticks_from_empty_at_target": 200,
+      "reserve_policy": "prioritize_active_machines_then_charge_battery_with_surplus",
+      "overload_policy": "reduce_or_pause_battery_charging_before_throttling_machines",
+      "balance_status": "initial_target_requires_in_game_performance_testing"
     }
   }
 }
