@@ -70,10 +70,74 @@ function getToolBatteryItemProperty(battery) {
   return { ok: true, key: TOOL_BATTERY_STATE_KEY, value: encoded.state };
 }
 
+
+/**
+ * Read battery state directly from a Bedrock ItemStack-like object.
+ * ItemStack dynamic properties travel with the item when it is moved between
+ * inventory slots. The caller must register the property in the world script
+ * bootstrap before using this adapter in-game.
+ */
+function readToolBatteryFromItem(itemStack, expectedToolId) {
+  if (!itemStack || typeof itemStack.getDynamicProperty !== "function") {
+    return { ok: false, reason: "item_dynamic_properties_unavailable" };
+  }
+  let rawState;
+  try {
+    rawState = itemStack.getDynamicProperty(TOOL_BATTERY_STATE_KEY);
+  } catch {
+    return { ok: false, reason: "item_state_read_failed" };
+  }
+  return deserializeToolBattery(rawState, expectedToolId);
+}
+
+/** Persist a validated battery on the same ItemStack instance. */
+function writeToolBatteryToItem(itemStack, battery) {
+  if (!itemStack || typeof itemStack.setDynamicProperty !== "function") {
+    return { ok: false, reason: "item_dynamic_properties_unavailable" };
+  }
+  const encoded = getToolBatteryItemProperty(battery);
+  if (!encoded.ok) return encoded;
+  try {
+    itemStack.setDynamicProperty(encoded.key, encoded.value);
+  } catch {
+    return { ok: false, reason: "item_state_write_failed" };
+  }
+  return { ok: true, itemStack };
+}
+
+/**
+ * Apply one energy operation and persist its resulting battery atomically from
+ * the caller's perspective. The callback must return { ok: true, battery }.
+ * No ItemStack property is changed when reading or the operation fails.
+ */
+function mutateToolBatteryItem(itemStack, expectedToolId, operation) {
+  if (typeof operation !== "function") {
+    return { ok: false, reason: "invalid_battery_operation" };
+  }
+  const restored = readToolBatteryFromItem(itemStack, expectedToolId);
+  if (!restored.ok) return restored;
+  let result;
+  try {
+    result = operation(restored.battery);
+  } catch {
+    return { ok: false, reason: "battery_operation_failed" };
+  }
+  if (!result || result.ok !== true || !validateToolBattery(result.battery)
+    || result.battery.toolId !== expectedToolId) {
+    return { ok: false, reason: "invalid_battery_operation_result", operation: result };
+  }
+  const saved = writeToolBatteryToItem(itemStack, result.battery);
+  if (!saved.ok) return { ...saved, operation: result };
+  return { ok: true, itemStack, battery: result.battery, operation: result };
+}
+
 module.exports = {
   TOOL_BATTERY_STATE_SCHEMA,
   TOOL_BATTERY_STATE_KEY,
   serializeToolBattery,
   deserializeToolBattery,
   getToolBatteryItemProperty,
+  readToolBatteryFromItem,
+  writeToolBatteryToItem,
+  mutateToolBatteryItem,
 };
