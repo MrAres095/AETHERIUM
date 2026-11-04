@@ -29,3 +29,17 @@ screenshot or a promise that the block is already placeable.
 - Use original AETHERIUM silhouettes and textures; do not reproduce another
   mod's distinctive machine design.
 - Add a structural test whenever a new machine geometry asset is introduced.
+
+## First block registration
+
+The Item Extractor now has a matching Behavior Pack block definition at
+`behavior_pack/blocks/aetherium_item_extractor.json`, a self-drop loot table,
+and an English display name. Its client-side geometry identifier matches the
+geometry asset exactly.
+
+For this first registration pass, the block temporarily reuses the existing
+Aetherium Crystal Block texture atlas entry. A dedicated 16×16 industrial
+texture is still needed; the GitHub text-file workflow cannot safely create a
+binary PNG texture. The block is placeable as a static decorative prototype,
+but extraction logic, energy consumption, facing configuration, and real
+inventory access are not implemented yet.
