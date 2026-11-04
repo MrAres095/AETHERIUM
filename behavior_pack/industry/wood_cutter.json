@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "id": "aetherium:wood_cutter",
+  "powered": true,
+  "role": "automatic_tree_farm_and_log_harvester",
+  "operation": {
+    "area_selection": "small_configurable_tree_plot",
+    "cuts_only_registered_tree_types": true,
+    "requires_mature_tree": true,
+    "bounded_blocks_per_tick": 4,
+    "collect_actual_block_drops": true,
+    "preserve_saplings": true,
+    "replant_from_internal_sapling_slot": true,
+    "wait_for_tree_growth": true,
+    "never_cut_outside_selected_plot": true,
+    "skip_unknown_blocks": true,
+    "pause_when_output_full": true,
+    "never_void_drops": true
+  },
+  "inventory": {
+    "input_slots": ["saplings"],
+    "output_slots": ["logs", "sticks", "saplings"],
+    "optional_byproduct": "aetherium:wood_chips",
+    "wood_chips_from": "logs_processed_by_aetherium:wood_processor"
+  },
+  "safety": {
+    "never_break_containers_or_machine_blocks": true,
+    "never_break_player_placed_blocks_outside_plot": true,
+    "no_chunk_loading_by_default": true,
+    "world_closed_background_work_guaranteed": false
+  },
+  "fuel_supply": {
+    "preferred_route": "wood_cutter_to_wood_processor_to_charcoal_kiln_to_boiler",
+    "direct_logs_allowed": true,
+    "charcoal_is_more_efficient_than_raw_logs": "balance_to_be_tested"
+  }
+}
