@@ -197,3 +197,20 @@ The configuration and scheduler are unit-tested and included in both CI workflow
 The engine-independent module `behavior_pack/scripts/logistics_state.js` defines a versioned save format for the Item Extractor and Item Inserter. Each machine state contains its identifier, validated face/filter/transfer configuration and a nine-slot internal buffer. Serialization and deserialization are bounded and reject malformed JSON, unsupported schema versions, invalid item identifiers and impossible stack amounts. Updating the configuration preserves the buffer; updating the buffer preserves configuration. State objects and slot arrays are detached to avoid accidental external mutation.
 
 This is a persistence contract ready for an engine adapter, not proof of in-world persistence yet. The Bedrock dynamic-property registration, block-position keying, save/load lifecycle, chunk unload handling and recovery behavior still need implementation and in-game testing. No claim is made that items currently survive breaking or replacing a machine block.
+
+
+## Logistics machine cycle orchestration
+
+The engine-independent `logistics_machine.js` module now coordinates one bounded
+cycle for both machine blocks. The Item Extractor reads from the configured
+adjacent inventory and transfers into its nine-slot internal buffer; the Item
+Inserter transfers from that buffer into the configured adjacent inventory.
+Both use the shared transfer transaction, configured face, whitelist/blacklist,
+tick interval, stack limit and item limit. Disabled machines and cycles that
+are not due do not inspect inventories. Missing neighbors and invalid adapters
+fail safely.
+
+The caller supplies the world tick, resolves the adjacent inventory and owns
+the Bedrock inventory/dynamic-property adapters. This orchestration module is
+not yet wired to the Bedrock Script API, block interaction UI, or world-save
+lifecycle; in-game operation and persistence are not claimed yet.
