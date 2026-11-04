@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "family": "aetherium:logistics",
+  "transport_mode": "direct_machine_to_machine_block_connections_only",
+  "prohibited_transport": [
+    "minecarts",
+    "rails",
+    "moving_cart_entities"
+  ],
+  "machines": [
+    {
+      "id": "aetherium:item_extractor",
+      "role": "pull_items_from_adjacent_machine_or_container",
+      "rules": [
+        "configured_output_side_or_adjacent_target",
+        "extract_only_from_supported_inventory_adapters",
+        "respect_source_filters_and_reservations",
+        "move_only_when_destination_capacity_is_confirmed",
+        "never_duplicate_or_void_items",
+        "bounded_transfer_per_cycle",
+        "pause_when_network_or_destination_is_full"
+      ]
+    },
+    {
+      "id": "aetherium:item_inserter",
+      "role": "push_items_into_adjacent_machine_or_container",
+      "rules": [
+        "configured_input_side_or_adjacent_target",
+        "respect_destination_input_filters_and_recipe_acceptance",
+        "transfer_only_after_destination_capacity_is_confirmed",
+        "never_duplicate_or_void_items",
+        "bounded_transfer_per_cycle",
+        "pause_when_source_empty_or_destination_full"
+      ]
+    }
+  ],
+  "connection": {
+    "adjacency": "machines_connect_through_directly_adjacent_faces; no physical pipe or cart required",
+    "configuration": "player_selects_front_back_left_right_up_down_face_and_filter",
+    "network": "optional_chain_of_adjacent_extractors_and_inserters; no global wireless transfer in first version",
+    "buffer": "small_internal_buffer_with_persistent_contents",
+    "power_unit": "AEU",
+    "unpowered": "stop_without_losing_buffered_items"
+  },
+  "filters": {
+    "modes": [
+      "whitelist",
+      "blacklist"
+    ],
+    "matching": [
+      "item_identifier",
+      "optional_tag"
+    ],
+    "default": "allow_all_supported_items"
+  },
+  "transaction_safety": [
+    "reserve_source_stack",
+    "validate_destination_capacity",
+    "write_destination",
+    "commit_source_decrement",
+    "rollback_destination_if_source_commit_fails",
+    "persist_transfer_receipt_to_prevent_replay_after_reload",
+    "unknown_inventory_adapter_is_rejected_safely"
+  ],
+  "performance": {
+    "max_stack_transfers_per_cycle": 4,
+    "cycle_interval_ticks": 10,
+    "block_scans": "only configured adjacent faces; never scan chunks",
+    "chunk_loading": false
+  },
+  "integrations": [
+    "crop_farm_harvester",
+    "wood_cutter",
+    "mob_loot_collector",
+    "animal_product_collector",
+    "grinder",
+    "boiler_fuel_input",
+    "battery",
+    "storage_chests"
+  ],
+  "constraints": [
+    "no_minecart_or_rail_dependency",
+    "no_item_creation",
+    "no_item_deletion",
+    "no_chunk_loading_by_default",
+    "no_work_while_world_is_closed"
+  ]
+}
