@@ -85,7 +85,6 @@ function planItemTransfer(sourceSlots, destinationSlots, options = {}) {
       movedItems += amount;
     }
 
-    const movedFromStack = Math.min(source.amount, maxItems - (movedItems - (source.amount - remaining)));
     const transferred = Math.min(source.amount, Math.min(maxItems, source.amount) - remaining);
     if (transferred > 0) {
       source.amount -= transferred;
