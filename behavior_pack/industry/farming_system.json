@@ -102,6 +102,45 @@
   "mob_farm": {
     "machines": [
       {
+        "id": "aetherium:mob_spawn_amplifier",
+        "role": "increase_hostile_mob_spawn_opportunities_inside_configured_farm",
+        "power": "AEU",
+        "tiers": [
+          {
+            "tier": 1,
+            "spawn_attempt_multiplier": 2,
+            "local_mob_cap": 16,
+            "range_blocks": 16,
+            "consumption_aeu_per_tick": 100
+          },
+          {
+            "tier": 2,
+            "spawn_attempt_multiplier": 4,
+            "local_mob_cap": 32,
+            "range_blocks": 24,
+            "consumption_aeu_per_tick": 250
+          },
+          {
+            "tier": 3,
+            "spawn_attempt_multiplier": 8,
+            "local_mob_cap": 48,
+            "range_blocks": 32,
+            "consumption_aeu_per_tick": 500
+          }
+        ],
+        "rules": [
+          "increase_spawn_attempt_frequency_not_guaranteed_spawn_rate",
+          "spawn_only_supported_hostile_mobs",
+          "check_valid_spawn_position_and_mob_specific_conditions",
+          "respect_world_difficulty_and_hostile_spawning_game_rules",
+          "respect_player_distance_and_dimension_rules",
+          "enforce_configured_local_mob_cap_and_server_safety_cap",
+          "pause_when_powered_off_or_output_is_full",
+          "never_spawn_inside_solid_blocks_or_in_protected_player_builds",
+          "no_named_or_player_owned_mobs"
+        ]
+      },
+      {
         "id": "aetherium:mob_attractor",
         "role": "route_existing_hostile_mobs_into_farm",
         "rules": [
@@ -155,12 +194,13 @@
       "minecraft:witch",
       "minecraft:enderman"
     ],
-    "spawn_rule": "vanilla_spawn_rules_remain_authoritative",
+    "spawn_rule": "spawn_amplifier_uses_valid_server_authoritative_spawn_checks_and_world_rules",
     "safety": [
-      "no_forced_spawning",
+      "no_unbounded_spawning",
       "no_mob_duplication",
       "no_loot_or_xp_generation_without_real_kill",
-      "player_owned_mobs_and_named_pets_are_excluded_by_default"
+      "player_owned_mobs_and_named_pets_are_excluded_by_default",
+      "stop_spawning_when_local_cap_or_server_safety_cap_is_reached"
     ]
   },
   "shared": {
