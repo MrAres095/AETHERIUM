@@ -3,7 +3,10 @@
 Status: design specification only; these systems are not implemented in-game yet.
 
 ## Energy and batteries
-Use integer Aetherium Energy Units (AEU). Battery tiers are real stores: Tier I 100,000 AEU / 500 AEU per tick; Tier II 500,000 / 2,500; Tier III 2,500,000 / 10,000. Rechargeable handheld tools (Drill, Chainsaw and future tools) stop at zero charge and recharge at a powered Charging Station. The current logic prototype defines a 20,000 AEU Drill battery (100 AEU per use) and a 30,000 AEU Chainsaw battery (150 AEU per use); these are initial balance values, not final gameplay tuning. Tool actions are atomic: a tool does not perform an action unless it can pay the full energy cost. The Charging Station transfers only energy available from its own battery, respects tool input limits and never overfills the tool.
+Use integer Aetherium Energy Units (AEU). AEU is the single canonical energy unit shown in battery, tool, machine, charging-station and network interfaces. Battery tiers are real stores: Tier I 100,000 AEU / 500 AEU per tick; Tier II 500,000 / 2,500; Tier III 2,500,000 / 10,000. Rechargeable handheld tools (Drill, Chainsaw and future tools) stop at zero charge and recharge at a powered Charging Station. The current logic prototype defines a 20,000 AEU Drill battery (100 AEU per use) and a 30,000 AEU Chainsaw battery (150 AEU per use); these are initial balance values, not final gameplay tuning. Tool actions are atomic: a tool does not perform an action unless it can pay the full energy cost. The Charging Station transfers only energy available from its own battery, respects tool input limits and never overfills the tool.
+
+### Handheld battery persistence
+Charge belongs to the battery item, not to the inventory slot, player session or machine slot. Removing a charged tool, moving it between inventory slots, placing it in a supported machine slot and taking it back must preserve its exact stored AEU. Every successful charge or tool use must persist the updated item state. A missing state may initialize a new battery at zero; malformed, unsupported-version, wrong-tool or out-of-range state must be rejected and must never silently grant energy or reset a previously charged item. The current pure-JavaScript codec stores a versioned payload containing the schema version, tool ID and stored AEU, and has round-trip/tamper tests. The Bedrock ItemStack dynamic-property adapter, unique item identity/anti-duplication handling and in-game save/reload verification are still pending; do not treat the codec alone as a completed in-game battery.
 
 ## Wireless power
 Wireless transmission uses 16-block link segments. Each added relay is a real battery-backed node with its own charge and transfer limit; it forwards only energy received. Relays do not create energy and do not automatically load chunks. Initial design is same-dimension and line-of-sight. Wired cables remain more efficient. Chunk loading is a separate optional powered system subject to Bedrock ticking-area limits; no work is promised while the world is closed.
@@ -18,7 +21,7 @@ Powered lights support Always On, Always Off, Night, Day, Motion, Redstone and P
 
 ## Implementation sequence
 1. Integer energy ledger and battery storage (logic prototype and tests added).
-2. Rechargeable tool battery drain and Charging Station transfer (logic prototype and tests added); connect both to Bedrock Script API next.
+2. Rechargeable tool battery drain and Charging Station transfer (logic prototype and tests added); persistent state codec and unit tests added; connect to Bedrock Script API next.
 3. Wired transfer and Charging Station runtime blocks.
 4. Wireless transmitter, receiver and battery-backed relays.
 5. Quarry area selection, preview and bounded mining transactions.
