@@ -231,3 +231,8 @@ and is not crash-safe across a process/world interruption between its two
 inventory writes. This is still an engine-independent contract: it does not
 yet register Bedrock Script API components or prove that an in-game block
 retains its inventory after breaking, replacing, unloading or reloading.
+
+
+### Logistics buffer restore guard
+
+Before a due transfer cycle, the logistics orchestrator now reads the live buffer adapter and compares all nine slots with the validated persisted machine snapshot (item ID, amount, stack limit and tags). A mismatch or failed snapshot read stops the cycle before the neighboring inventory is even resolved. This prevents a stale or uninitialized adapter from silently replacing a saved buffer with empty contents or moving items against an inconsistent state. The caller must still restore the adapter from the saved snapshot; this guard detects a mismatch but does not itself perform Bedrock world persistence or crash recovery.
