@@ -18,9 +18,32 @@
     "pause_when_output_full": true,
     "never_void_drops": true
   },
+  "replanting": {
+    "automatic_replant": true,
+    "requires_matching_sapling": true,
+    "bone_meal": {
+      "enabled": true,
+      "automatic_application": true,
+      "consumed_from_dedicated_input_slot": true,
+      "apply_immediately_after_replant": true,
+      "repeat_until_tree_reaches_maturity_or_bone_meal_runs_out": true,
+      "only_apply_to_valid_saplings": true,
+      "stop_consuming_when_tree_is_mature": true,
+      "if_empty": "wait_for_natural_growth_and_report_low_bone_meal",
+      "never_generate_bone_meal": true
+    },
+    "natural_growth_fallback": true
+  },
   "inventory": {
-    "input_slots": ["saplings"],
-    "output_slots": ["logs", "sticks", "saplings"],
+    "input_slots": [
+      "saplings",
+      "minecraft:bone_meal"
+    ],
+    "output_slots": [
+      "logs",
+      "sticks",
+      "saplings"
+    ],
     "optional_byproduct": "aetherium:wood_chips",
     "wood_chips_from": "logs_processed_by_aetherium:wood_processor"
   },
