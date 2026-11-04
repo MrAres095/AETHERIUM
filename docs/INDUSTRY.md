@@ -250,3 +250,10 @@ This is a data contract only. It does not yet attach custom data to a Bedrock it
 The engine-independent `logistics_lifecycle.js` module now defines the required adapter ordering for moving a machine's saved state into its dropped item and restoring it on placement. Breaking stages the payload on the dropped item before clearing machine storage; a failed storage clear attempts to remove the staged payload and reports when compensation itself fails. Placement validates the payload and machine type, writes the restored state first, and only then consumes the payload. Adapter failures are returned as explicit recovery/reconciliation states rather than reported as successful transfers.
 
 Seven tests cover operation ordering, write failures, compensation, wrong-machine payloads and placement reconciliation. This is still an adapter contract, not Bedrock event integration. The eventual runtime must provide durable item custom data and machine storage, enforce single-use placement/recovery, and test interruption/crash cases in a real world before item preservation can be guaranteed.
+
+
+## AEU battery persistence contract
+
+The Tier I/II/III battery state is persisted as a compact versioned item property containing only the battery tier and stored AEU. Capacity and per-tick input/output limits are reconstructed from the trusted tier definitions, so an item payload cannot grant a larger capacity by changing those values. The adapter validates the expected tier, rejects malformed/oversized/unsupported data, and updates the item property after charge or discharge operations. This is intended to preserve stored charge when a battery block is broken, moved as an item and placed again.
+
+The engine-independent adapter and tests are present in `behavior_pack/scripts/battery_state.js` and `tools/test_battery_state.js`. This is not yet wired to a real Bedrock battery block or its break/place events: the future runtime must register the dynamic property, copy it to the actual dropped ItemStack before removing the block's stored state, and restore it on placement. Android/BDS in-game persistence and crash/interruption behavior remain to be verified.
