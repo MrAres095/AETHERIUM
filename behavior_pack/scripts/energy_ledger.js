@@ -70,11 +70,12 @@ function transferWirelessHop(source, destination, requestedDelivery, lossPercent
     return { ok: true, sent: 0, delivered: 0, lost: 0, source: { ...source }, destination: { ...destination } };
   }
   const efficiency = (100 - lossPercent) / 100;
-  const maxDeliverable = Math.floor(Math.min(
-    source.maxOutputPerTick, source.stored,
+  const sourceLimitedDelivery = Math.floor(Math.min(source.maxOutputPerTick, source.stored) * efficiency);
+  const destinationLimitedDelivery = Math.min(
     destination.maxInputPerTick,
     destination.capacity - destination.stored
-  ) * efficiency);
+  );
+  const maxDeliverable = Math.min(sourceLimitedDelivery, destinationLimitedDelivery);
   const delivered = Math.min(requestedDelivery, maxDeliverable);
   const sent = Math.ceil(delivered / efficiency);
   const lost = sent - delivered;
