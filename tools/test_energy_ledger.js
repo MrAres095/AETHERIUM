@@ -3,47 +3,48 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createBattery, chargeBattery, dischargeBattery, transferEnergy, transferWirelessHop, validateWirelessRoute } = require("../behavior_pack/scripts/energy_ledger.js");
 
-
-test("creates rechargeable tool batteries with distinct profiles", () => {
-  const drill = createToolBattery("drill");
-  const saw = createToolBattery("chainsaw");
-  assert.equal(drill.battery.capacity, 20000);
-  assert.equal(drill.battery.energyPerUse, 100);
-  assert.equal(saw.battery.capacity, 30000);
-  assert.equal(saw.battery.energyPerUse, 150);
-  assert.equal(createToolBattery("pickaxe").reason, "unknown_energy_tool");
+test("battery tiers define bounded storage and throughput", () => {
+  assert.equal(createBattery(1).battery.capacity, 100000);
+  assert.equal(createBattery(2).battery.capacity, 500000);
+  assert.equal(createBattery(3).battery.capacity, 2500000);
+  assert.equal(createBattery(4).reason, "invalid_battery_tier");
 });
 
-test("tool actions consume a full cost atomically and stop when charge is insufficient", () => {
-  const drill = createToolBattery("drill", 250).battery;
-  const twoUses = consumeToolEnergy(drill, 2);
-  assert.equal(twoUses.canRun, true);
-  assert.equal(twoUses.consumed, 200);
-  assert.equal(twoUses.battery.stored, 50);
-  const blocked = consumeToolEnergy(twoUses.battery, 1);
-  assert.equal(blocked.canRun, false);
-  assert.equal(blocked.reason, "insufficient_charge");
-  assert.equal(blocked.battery.stored, 50);
-  assert.equal(drill.stored, 250);
+test("charging and discharging obey per-tick limits", () => {
+  const battery = createBattery(1).battery;
+  const charged = chargeBattery(battery, 900);
+  assert.equal(charged.accepted, 500);
+  assert.equal(charged.rejected, 400);
+  const drained = dischargeBattery(charged.battery, 700);
+  assert.equal(drained.delivered, 500);
+  assert.equal(drained.unmet, 200);
 });
 
-test("charging station transfers energy within station output and tool input limits", () => {
-  const station = createBattery(1, 1000).battery;
-  const drill = createToolBattery("drill").battery;
-  const result = chargeToolAtStation(station, drill, 900);
-  assert.equal(result.transferred, 250);
-  assert.equal(result.station.stored, 750);
-  assert.equal(result.tool.stored, 250);
-  assert.equal(station.stored, 1000);
+test("ordinary transfer conserves energy and respects destination capacity", () => {
+  const source = createBattery(2, 2000).battery;
+  const destination = createBattery(1, 99900).battery;
+  const result = transferEnergy(source, destination, 1500);
+  assert.equal(result.transferred, 100);
+  assert.equal(result.source.stored + result.destination.stored, 101900);
 });
 
-test("charging station never overfills tool or drains empty station", () => {
-  const station = createBattery(1, 50).battery;
-  const almostFull = createToolBattery("chainsaw", 29950).battery;
-  const result = chargeToolAtStation(station, almostFull, 500);
-  assert.equal(result.transferred, 50);
-  assert.equal(result.station.stored, 0);
-  assert.equal(result.tool.stored, 30000);
-  const empty = chargeToolAtStation(result.station, result.tool, 100);
-  assert.equal(empty.transferred, 0);
+test("wireless route limits each hop to 16 blocks in one dimension", () => {
+  const route = [
+    { dimension: "overworld", x: 0, y: 64, z: 0 },
+    { dimension: "overworld", x: 16, y: 64, z: 0 },
+    { dimension: "overworld", x: 32, y: 64, z: 0 },
+  ];
+  assert.equal(validateWirelessRoute(route).ok, true);
+  assert.equal(validateWirelessRoute([route[0], { ...route[1], x: 17 }]).reason, "segment_out_of_range");
+});
+
+test("wireless hop accounts for transmission loss and relay battery limits", () => {
+  const source = createBattery(2, 1000).battery;
+  const relay = createBattery(1).battery;
+  const result = transferWirelessHop(source, relay, 190, 5);
+  assert.equal(result.sent, 200);
+  assert.equal(result.delivered, 190);
+  assert.equal(result.lost, 10);
+  assert.equal(result.source.stored, 800);
+  assert.equal(result.destination.stored, 190);
 });
