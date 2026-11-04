@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "family": "aetherium:farming",
+  "crop_farm": {
+    "machines": [
+      {
+        "id": "aetherium:planter",
+        "role": "plant_seeds_and_saplings",
+        "rules": [
+          "plant_only_on_valid_farmland_or_supported_soil",
+          "respect_crop_type",
+          "consume_real_seed_items",
+          "never_create_seeds"
+        ]
+      },
+      {
+        "id": "aetherium:irrigation_unit",
+        "role": "water_nearby_farmland",
+        "rules": [
+          "water_is_a_growth_modifier_not_consumed_per_tick",
+          "range_is_configurable",
+          "must_be_connected_to_water_source_or_tank"
+        ]
+      },
+      {
+        "id": "aetherium:fertilizer_station",
+        "role": "automatically_apply_bone_meal",
+        "input": "minecraft:bone_meal",
+        "rules": [
+          "consume_one_real_bone_meal_per_successful_growth_application",
+          "only_apply_to_supported_growing_crops",
+          "stop_when_mature_or_inventory_empty"
+        ]
+      },
+      {
+        "id": "aetherium:harvester",
+        "role": "harvest_and_replant",
+        "rules": [
+          "harvest_mature_crops_only",
+          "collect_real_drops",
+          "replant_using_matching_seeds_from_inventory",
+          "pause_when_output_full",
+          "never_void_drops"
+        ]
+      }
+    ],
+    "supported_initial_crops": [
+      "minecraft:wheat",
+      "minecraft:carrots",
+      "minecraft:potatoes",
+      "minecraft:beetroots",
+      "minecraft:nether_wart",
+      "minecraft:sugar_cane",
+      "minecraft:pumpkin",
+      "minecraft:melon"
+    ],
+    "integration": "machines_can_be_used_individually_or_as_a_small_automated_farm_line"
+  },
+  "animal_farm": {
+    "machines": [
+      {
+        "id": "aetherium:animal_feeder",
+        "role": "feed_supported_animals_for_breeding",
+        "rules": [
+          "use_real_food_items",
+          "respect_breeding_cooldowns",
+          "do_not_force_spawn_animals"
+        ]
+      },
+      {
+        "id": "aetherium:livestock_manager",
+        "role": "maintain_configured_population",
+        "rules": [
+          "population_cap_per_enclosure",
+          "pause_breeding_at_cap",
+          "never_kill_animals_automatically"
+        ]
+      },
+      {
+        "id": "aetherium:product_collector",
+        "role": "collect_non_lethal_animal_products",
+        "rules": [
+          "collect_eggs_and_wool",
+          "milk_requires_player_or_future_safe_milking_adapter",
+          "do_not_harm_animals"
+        ]
+      }
+    ],
+    "supported_initial_animals": [
+      "minecraft:cow",
+      "minecraft:sheep",
+      "minecraft:pig",
+      "minecraft:chicken"
+    ],
+    "safety": [
+      "never_kill_animals",
+      "never_collect_from_outside_configured_enclosure",
+      "pause_if_storage_full"
+    ]
+  },
+  "mob_farm": {
+    "machines": [
+      {
+        "id": "aetherium:mob_attractor",
+        "role": "route_existing_hostile_mobs_into_farm",
+        "rules": [
+          "only_affect_existing_mobs",
+          "configurable_filter",
+          "bounded_range",
+          "no_mob_duplication"
+        ]
+      },
+      {
+        "id": "aetherium:mob_sorter",
+        "role": "sort_mobs_by_type_or_tag",
+        "rules": [
+          "unknown_mobs_go_to_safe_bypass",
+          "never_delete_mobs"
+        ]
+      },
+      {
+        "id": "aetherium:mob_damager",
+        "role": "automated_damage_station",
+        "rules": [
+          "damage_is_real_and_server_authoritative",
+          "configurable_damage",
+          "must_not_generate_xp_or_drops_directly"
+        ]
+      },
+      {
+        "id": "aetherium:loot_collector",
+        "role": "collect_actual_mob_drops",
+        "rules": [
+          "collect_only_real_drops",
+          "pause_if_storage_full",
+          "never_void_drops"
+        ]
+      },
+      {
+        "id": "aetherium:experience_collector",
+        "role": "collect_and_store_real_experience",
+        "rules": [
+          "collect_only_existing_xp_orbs",
+          "store_in_xp_cell_or_transfer_to_player",
+          "never_create_xp"
+        ]
+      }
+    ],
+    "supported_initial_mobs": [
+      "minecraft:zombie",
+      "minecraft:skeleton",
+      "minecraft:creeper",
+      "minecraft:spider",
+      "minecraft:witch",
+      "minecraft:enderman"
+    ],
+    "spawn_rule": "vanilla_spawn_rules_remain_authoritative",
+    "safety": [
+      "no_forced_spawning",
+      "no_mob_duplication",
+      "no_loot_or_xp_generation_without_real_kill",
+      "player_owned_mobs_and_named_pets_are_excluded_by_default"
+    ]
+  },
+  "shared": {
+    "power_unit": "AEU",
+    "power_behavior": "machines_stop_safely_when_unpowered",
+    "storage_behavior": "pause_before_outputs_fill_and_never_delete_items",
+    "chunk_loading": "disabled_by_default",
+    "world_closed_background_work": false
+  }
+}
