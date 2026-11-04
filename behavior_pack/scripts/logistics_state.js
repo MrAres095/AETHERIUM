@@ -120,6 +120,7 @@ module.exports = {
   BUFFER_SLOT_COUNT,
   MACHINE_IDS,
   createLogisticsMachineState,
+  validateState,
   validateBufferSlots,
   serializeLogisticsMachineState,
   deserializeLogisticsMachineState,
