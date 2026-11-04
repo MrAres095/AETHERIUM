@@ -14,6 +14,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Explicit vanilla ingredients accepted by crafting recipes. Outputs and custom
+# ingredients must still resolve to content registered by this add-on.
+VANILLA_RECIPE_INGREDIENTS = {"minecraft:iron_ingot", "minecraft:redstone"}
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
@@ -177,7 +180,7 @@ def validate_recipes(known_items: set[str]) -> None:
             for symbol in used_symbols:
                 ingredient = key_map.get(symbol)
                 item = ingredient.get("item") if isinstance(ingredient, dict) else None
-                if item not in known_items:
+                if item not in known_items and item not in VANILLA_RECIPE_INGREDIENTS:
                     error(f"{relative}: pattern symbol '{symbol}' has an unknown or missing ingredient")
             unused = set(key_map) - used_symbols
             if unused:
@@ -189,7 +192,7 @@ def validate_recipes(known_items: set[str]) -> None:
                 continue
             for ingredient in ingredients:
                 item = ingredient.get("item") if isinstance(ingredient, dict) else None
-                if item not in known_items:
+                if item not in known_items and item not in VANILLA_RECIPE_INGREDIENTS:
                     error(f"{relative}: unknown or missing shapeless ingredient '{item}'")
 
 
