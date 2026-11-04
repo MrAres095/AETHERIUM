@@ -64,7 +64,7 @@ test("transaction writes destination before consuming source", () => {
 });
 
 test("source write failure rolls destination back", () => {
-  const source = adapter([{ typeId: "minecraft:coal", amount: 8 }], true);
+  const source = adapter([{ typeId: "minecraft:coal", amount: 8 }], 1);
   const destination = adapter([null]);
   const result = executeItemTransfer(source, destination);
   assert.deepEqual(result, { ok: false, reason: "source_write_failed_rolled_back" });
