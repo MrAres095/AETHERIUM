@@ -236,3 +236,10 @@ retains its inventory after breaking, replacing, unloading or reloading.
 ### Logistics buffer restore guard
 
 Before a due transfer cycle, the logistics orchestrator now reads the live buffer adapter and compares all nine slots with the validated persisted machine snapshot (item ID, amount, stack limit and tags). A mismatch or failed snapshot read stops the cycle before the neighboring inventory is even resolved. This prevents a stale or uninitialized adapter from silently replacing a saved buffer with empty contents or moving items against an inconsistent state. The caller must still restore the adapter from the saved snapshot; this guard detects a mismatch but does not itself perform Bedrock world persistence or crash recovery.
+
+
+### Portable machine state when broken or moved
+
+The engine-independent logistics state module now defines a versioned drop-payload contract. A break-event adapter can serialize the machine identifier, configuration and nine-slot buffer into a bounded payload for the dropped machine item; a placement adapter can validate and restore it. Restoration rejects malformed or oversized data, unsupported payload versions, and payloads applied to the wrong machine type. The embedded state is validated again before it is returned.
+
+This is a data contract only. It does not yet attach custom data to a Bedrock item, intercept block break/place events, or delete/reconcile world storage. The runtime adapter must write the payload to the dropped item successfully before clearing the block's saved state, and must consume/clear the payload exactly once after successful placement. Until that adapter and its crash-recovery behavior are implemented and tested in-game, machine contents are not yet guaranteed to survive breaking or moving the block.
