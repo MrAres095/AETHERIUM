@@ -19,6 +19,26 @@ const INSERTER_ID = "aetherium:item_inserter";
  * On a committed cycle the returned state contains the new buffer snapshot;
  * the caller must persist it through its chosen Bedrock storage adapter.
  */
+function sameBufferSnapshot(actual, expected) {
+  if (!Array.isArray(actual) || !Array.isArray(expected) ||
+      actual.length !== expected.length) return false;
+  for (let i = 0; i < actual.length; i += 1) {
+    const a = actual[i], b = expected[i];
+    if (a === null || b === null) {
+      if (a !== b) return false;
+      continue;
+    }
+    if (!a || !b || a.typeId !== b.typeId || a.amount !== b.amount ||
+        (a.maxAmount ?? 64) !== (b.maxAmount ?? 64)) return false;
+    const aTags = a.tags ?? [];
+    const bTags = b.tags ?? [];
+    if (!Array.isArray(aTags) || !Array.isArray(bTags) ||
+        aTags.length !== bTags.length ||
+        aTags.some((tag, index) => tag !== bTags[index])) return false;
+  }
+  return true;
+}
+
 function runLogisticsMachineCycle(state, tick, bufferAdapter, resolveAdjacentInventory) {
   const validated = validateState(state);
   if (!validated.ok) return validated;
@@ -39,6 +59,19 @@ function runLogisticsMachineCycle(state, tick, bufferAdapter, resolveAdjacentInv
   if (!bufferAdapter || typeof bufferAdapter.readSlots !== "function" ||
       typeof bufferAdapter.writeSlots !== "function") {
     return { ok: false, reason: "invalid_buffer_adapter" };
+  }
+
+  // Refuse to move items if the live buffer adapter was not restored from the
+  // persisted snapshot. Otherwise a stale/empty adapter could overwrite saved
+  // contents on the next successful cycle.
+  let currentBuffer;
+  try {
+    currentBuffer = bufferAdapter.readSlots();
+  } catch {
+    return { ok: false, reason: "buffer_snapshot_read_failed" };
+  }
+  if (!sameBufferSnapshot(currentBuffer, machine.bufferSlots)) {
+    return { ok: false, reason: "buffer_state_out_of_sync" };
   }
 
   const offset = getAdjacentOffset(machine.config.targetFace);
@@ -97,4 +130,4 @@ function runLogisticsMachineCycle(state, tick, bufferAdapter, resolveAdjacentInv
   return { ...result, state: updated.state };
 }
 
-module.exports = { runLogisticsMachineCycle };
+module.exports = { runLogisticsMachineCycle, sameBufferSnapshot };
