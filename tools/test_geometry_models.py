@@ -62,6 +62,25 @@ class GeometryModelTests(unittest.TestCase):
                 self.assertGreaterEqual(start, 0)
                 self.assertLessEqual(start + extent, 16)
 
+    def test_logistics_crafting_recipes_match_their_machine_blocks(self):
+        expected = {
+            "item_extractor": ("aetherium:item_extractor", "aetherium:ingot"),
+            "item_inserter": ("aetherium:item_inserter", "aetherium:crystal"),
+        }
+        for machine, (output_id, core_id) in expected.items():
+            with self.subTest(machine=machine):
+                path = ROOT / f"behavior_pack/recipes/{machine}.json"
+                recipe = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual(recipe["format_version"], "1.20.10")
+                body = recipe["minecraft:recipe_shaped"]
+                self.assertEqual(body["description"]["identifier"], output_id)
+                self.assertEqual(body["tags"], ["crafting_table"])
+                self.assertEqual(body["result"]["item"], output_id)
+                ingredients = {entry["item"] for entry in body["key"].values()}
+                self.assertIn(core_id, ingredients)
+                self.assertIn("minecraft:iron_ingot", ingredients)
+                self.assertIn("minecraft:redstone", ingredients)
+
     def test_item_extractor_geometry_is_valid_and_bounded(self):
         path = ROOT / "resource_pack/models/blocks/aetherium_item_extractor.geo.json"
         model = json.loads(path.read_text(encoding="utf-8"))
