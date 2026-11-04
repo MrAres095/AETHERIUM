@@ -161,3 +161,40 @@ test("a no-op cycle returns the unchanged validated machine state", () => {
   assert.equal(result.reason, "not_due");
   assert.deepEqual(result.state.bufferSlots, empty());
 });
+
+
+test("stale buffer adapter is rejected before any adjacent inventory is inspected", () => {
+  const sourceSlots = empty();
+  sourceSlots[0] = { typeId: "minecraft:iron_ingot", amount: 8 };
+  const adjacent = adapter(sourceSlots);
+  const staleBuffer = adapter(empty());
+  const savedSlots = empty();
+  savedSlots[0] = { typeId: "minecraft:gold_ingot", amount: 3 };
+  const state = createLogisticsMachineState("aetherium:item_extractor", {
+    config: { intervalTicks: 1 },
+    bufferSlots: savedSlots,
+  }).state;
+
+  const result = runLogisticsMachineCycle(state, 1, staleBuffer, () => {
+    assert.fail("out-of-sync buffer must stop before neighbor lookup");
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "buffer_state_out_of_sync");
+  assert.equal(adjacent.snapshot()[0].amount, 8);
+  assert.deepEqual(staleBuffer.snapshot(), empty());
+});
+
+test("buffer adapter read failure is rejected before transfer", () => {
+  const state = createLogisticsMachineState("aetherium:item_extractor", {
+    config: { intervalTicks: 1 },
+  }).state;
+  const brokenBuffer = {
+    readSlots() { throw new Error("read failed"); },
+    writeSlots() { assert.fail("must not write"); },
+  };
+  const result = runLogisticsMachineCycle(state, 1, brokenBuffer, () => {
+    assert.fail("must not inspect neighbor");
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "buffer_snapshot_read_failed");
+});
