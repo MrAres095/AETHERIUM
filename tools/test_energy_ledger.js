@@ -82,3 +82,33 @@ test("rejects tampered battery snapshots and fractional energy", () => {
   assert.equal(chargeBattery(battery, 0.5).reason, "invalid_energy_amount");
   assert.equal(dischargeBattery(battery, -2).reason, "invalid_energy_amount");
 });
+
+test("wireless hop charges source for 5% loss and stores only delivered energy", () => {
+  const source = createBattery(2, 1000).battery;
+  const relay = createBattery(1, 0).battery;
+  const result = transferWirelessHop(source, relay, 190, 5);
+  assert.equal(result.delivered, 190);
+  assert.equal(result.sent, 200);
+  assert.equal(result.lost, 10);
+  assert.equal(result.source.stored, 800);
+  assert.equal(result.destination.stored, 190);
+  assert.equal(source.stored, 1000);
+});
+
+test("wireless hop obeys battery throughput and capacity after accounting for loss", () => {
+  const source = createBattery(1, 500).battery;
+  const nearlyFullRelay = createBattery(1, 99900).battery;
+  const result = transferWirelessHop(source, nearlyFullRelay, 500);
+  assert.equal(result.delivered, 100);
+  assert.equal(result.sent, 106);
+  assert.equal(result.lost, 6);
+  assert.equal(result.source.stored, 394);
+  assert.equal(result.destination.stored, 100000);
+});
+
+test("wireless hop rejects invalid loss and fractional requests", () => {
+  const a = createBattery(1, 1000).battery;
+  const b = createBattery(1).battery;
+  assert.equal(transferWirelessHop(a, b, 10, 100).reason, "invalid_loss_percent");
+  assert.equal(transferWirelessHop(a, b, 1.5).reason, "invalid_energy_amount");
+});
