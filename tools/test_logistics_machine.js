@@ -35,6 +35,7 @@ test("extractor pulls existing items from the configured adjacent inventory into
   assert.equal(result.movedItems, 8);
   assert.equal(adjacent.snapshot()[0].amount, 4);
   assert.equal(buffer.snapshot()[0].amount, 8);
+  assert.equal(result.state.bufferSlots[0].amount, 8);
 });
 
 test("inserter pushes buffered items into the configured adjacent inventory", () => {
@@ -52,6 +53,7 @@ test("inserter pushes buffered items into the configured adjacent inventory", ()
   assert.equal(result.movedItems, 6);
   assert.equal(buffer.snapshot()[0].amount, 4);
   assert.equal(adjacent.snapshot()[0].amount, 6);
+  assert.equal(result.state.bufferSlots[0].amount, 4);
 });
 
 test("filter and stack limits are respected by the machine cycle", () => {
@@ -122,5 +124,40 @@ test("invalid machine state and invalid tick do not mutate inventory", () => {
   }).state;
   assert.equal(runLogisticsMachineCycle({ ...state, version: 999 }, 1, buffer, () => null).reason,
     "unsupported_state_version");
-  assert.equal(runLogisticsMachineCycle(state, -1, buffer, () => null).reason, "not_due");
+  assert.equal(runLogisticsMachineCycle(state, -1, buffer, () => null).reason, "invalid_tick");
+});
+
+
+test("returned buffer state can be serialized and restored after an extractor cycle", () => {
+  const { serializeLogisticsMachineState, deserializeLogisticsMachineState } =
+    require("../behavior_pack/scripts/logistics_state.js");
+  const sourceSlots = empty();
+  sourceSlots[0] = { typeId: "minecraft:copper_ingot", amount: 5 };
+  const adjacent = adapter(sourceSlots);
+  const buffer = adapter(empty());
+  const state = createLogisticsMachineState("aetherium:item_extractor", {
+    config: { intervalTicks: 1 },
+  }).state;
+
+  const cycle = runLogisticsMachineCycle(state, 1, buffer, () => adjacent);
+  assert.equal(cycle.ok, true);
+  const encoded = serializeLogisticsMachineState(cycle.state);
+  assert.equal(encoded.ok, true);
+  const restored = deserializeLogisticsMachineState(encoded.value);
+  assert.equal(restored.ok, true);
+  assert.equal(restored.state.bufferSlots[0].typeId, "minecraft:copper_ingot");
+  assert.equal(restored.state.bufferSlots[0].amount, 5);
+});
+
+test("a no-op cycle returns the unchanged validated machine state", () => {
+  const state = createLogisticsMachineState("aetherium:item_extractor", {
+    config: { intervalTicks: 20 },
+  }).state;
+  const buffer = adapter(empty());
+  const result = runLogisticsMachineCycle(state, 19, buffer, () => {
+    assert.fail("not-due cycle must not query adjacent inventory");
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.reason, "not_due");
+  assert.deepEqual(result.state.bufferSlots, empty());
 });
