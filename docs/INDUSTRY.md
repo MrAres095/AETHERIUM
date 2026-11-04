@@ -189,3 +189,11 @@ The engine-independent module `behavior_pack/scripts/logistics_config.js` now de
 - A deterministic tick scheduler checks whether an enabled machine is due to run; it does not create timers or depend on engine globals.
 
 The configuration and scheduler are unit-tested and included in both CI workflows. This is the shared rules layer only: player-facing face/filter UI, saving settings to block-entity/world dynamic properties, and the actual Bedrock inventory adapter still need runtime integration and in-game testing.
+
+
+
+### Persistent logistics buffer state
+
+The engine-independent module `behavior_pack/scripts/logistics_state.js` defines a versioned save format for the Item Extractor and Item Inserter. Each machine state contains its identifier, validated face/filter/transfer configuration and a nine-slot internal buffer. Serialization and deserialization are bounded and reject malformed JSON, unsupported schema versions, invalid item identifiers and impossible stack amounts. Updating the configuration preserves the buffer; updating the buffer preserves configuration. State objects and slot arrays are detached to avoid accidental external mutation.
+
+This is a persistence contract ready for an engine adapter, not proof of in-world persistence yet. The Bedrock dynamic-property registration, block-position keying, save/load lifecycle, chunk unload handling and recovery behavior still need implementation and in-game testing. No claim is made that items currently survive breaking or replacing a machine block.
