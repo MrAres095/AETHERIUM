@@ -1,0 +1,23 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "aetherium:item_extractor"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "IRI",
+      "IAI",
+      "IRI"
+    ],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "R": { "item": "minecraft:redstone" },
+      "A": { "item": "aetherium:ingot" }
+    },
+    "result": {
+      "item": "aetherium:item_extractor",
+      "count": 1
+    }
+  }
+}
