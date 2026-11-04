@@ -54,8 +54,8 @@ test("mutations persist charge changes on the same item", () => {
   const item = makeItem(serializeBattery(createBattery(1, 500).battery).state);
   const used = mutateBatteryItem(item, 1, battery => dischargeBattery(battery, 200));
   assert.equal(used.ok, true);
-  assert.equal(used.battery.stored, 0); // Tier I output is capped at 500; request is fully supplied.
-  assert.equal(readBatteryFromItem(item, 1).battery.stored, 0);
+  assert.equal(used.battery.stored, 300);
+  assert.equal(readBatteryFromItem(item, 1).battery.stored, 300);
 });
 
 test("failed mutation and failed property writes do not claim persistence", () => {
