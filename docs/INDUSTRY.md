@@ -214,3 +214,20 @@ The caller supplies the world tick, resolves the adjacent inventory and owns
 the Bedrock inventory/dynamic-property adapters. This orchestration module is
 not yet wired to the Bedrock Script API, block interaction UI, or world-save
 lifecycle; in-game operation and persistence are not claimed yet.
+
+
+### Buffer state hand-off after each logistics cycle
+
+After a successful transfer, `runLogisticsMachineCycle` returns a validated
+updated machine state whose nine buffer slots match the buffer adapter's
+post-transfer snapshot. The caller can serialize that returned state with
+`serializeLogisticsMachineState` and store it using the machine's persistent
+storage adapter. No-op cycles return the unchanged validated state, while
+invalid ticks and invalid inventory adapters fail without starting a transfer.
+
+The buffer adapter must be initialized from the machine's restored
+`bufferSlots` before a cycle runs. The transaction adapter remains synchronous
+and is not crash-safe across a process/world interruption between its two
+inventory writes. This is still an engine-independent contract: it does not
+yet register Bedrock Script API components or prove that an in-game block
+retains its inventory after breaking, replacing, unloading or reloading.
