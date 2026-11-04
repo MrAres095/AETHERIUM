@@ -1,0 +1,10 @@
+"use strict";
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const farm=JSON.parse(fs.readFileSync("behavior_pack/industry/farming_system.json","utf8"));
+test("crop farm uses real seeds and harvests mature crops only",()=>{const c=farm.crop_farm.machines;assert.ok(c.some(x=>x.id==="aetherium:planter"));const h=c.find(x=>x.id==="aetherium:harvester");assert.ok(h.rules.includes("harvest_mature_crops_only"));assert.ok(h.rules.includes("never_void_drops"));});
+test("Bone Meal is consumed only for real crop growth",()=>{const f=farm.crop_farm.machines.find(x=>x.id==="aetherium:fertilizer_station");assert.equal(f.input,"minecraft:bone_meal");assert.ok(f.rules.includes("consume_one_real_bone_meal_per_successful_growth_application"));});
+test("animal automation is non-lethal and population-limited",()=>{assert.ok(farm.animal_farm.safety.includes("never_kill_animals"));assert.ok(farm.animal_farm.machines.find(x=>x.id==="aetherium:livestock_manager").rules.includes("pause_breeding_at_cap"));});
+test("mob farm cannot create mobs, drops or XP",()=>{const m=farm.mob_farm;assert.equal(m.spawn_rule,"vanilla_spawn_rules_remain_authoritative");assert.ok(m.safety.includes("no_mob_duplication"));assert.ok(m.safety.includes("no_loot_or_xp_generation_without_real_kill"));assert.ok(m.mob_attractor===undefined);assert.ok(m.machines.find(x=>x.id==="aetherium:experience_collector").rules.includes("never_create_xp"));});
+test("farm outputs pause safely when storage is full",()=>{assert.ok(farm.shared.storage_behavior.includes("never_delete_items"));assert.ok(farm.animal_farm.safety.includes("pause_if_storage_full"));});
