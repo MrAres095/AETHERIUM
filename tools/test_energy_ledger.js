@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createBattery, chargeBattery, dischargeBattery, transferEnergy, transferWirelessHop, validateWirelessRoute } = require("../behavior_pack/scripts/energy_ledger.js");
+const { createBattery, chargeBattery, dischargeBattery, transferEnergy, transferWirelessHop, validateWirelessRoute, createToolBattery, consumeToolEnergy, chargeToolAtStation } = require("../behavior_pack/scripts/energy_ledger.js");
 
 test("battery tiers define bounded storage and throughput", () => {
   assert.equal(createBattery(1).battery.capacity, 100000);
