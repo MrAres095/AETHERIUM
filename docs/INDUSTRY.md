@@ -6,7 +6,7 @@ The Grinder is the first planned Industry machine. It processes explicitly suppo
 
 There are two distinct machines in the first release of this machine family:
 
-- **Manual Grinder** – an early-game, hand-operated machine. It needs no electricity, works more slowly, and is operated by the player. It does not support power-network automation. Its purpose is to make ore processing available before the player has built a power system.
+- **Manual Grinder** – an early-game, hand-operated machine. It needs no electricity, works more slowly, and is operated by the player. One interaction plans exactly one recipe operation; the initial balance target is a 20-tick (1 second) hand-operation cooldown. It does not support power-network automation or consume AEU. Its purpose is to make ore processing available before the player has built a power system.
 - **Electric Grinder** – a powered machine connected to Aetherium Power. It processes faster, can be automated through Logistics, and supports the shared three-slot upgrade system.
 
 They are separate recipes and machine identities, not one machine that silently switches between manual and electric modes. The manual version remains useful when power is unavailable or for small batches.
