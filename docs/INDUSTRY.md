@@ -82,3 +82,34 @@ The runtime must use an explicit transaction: validate input and full output cap
 ## Current status
 
 The JSON registry and static validation hook are present. The engine-independent JavaScript planner validates every recipe mapping in the registry (including unrelated entries and duplicate inputs), validates stack sizes, and only plans input consumption when the complete output fits. A separate storage transaction adapter writes output before consuming input and attempts to restore both previous input and output snapshots if either write throws. Tests cover partially applied output and input writes, successful rollback, and failed rollback. It reports rollback failure explicitly rather than claiming success. The GitHub Actions workflow validates the planner/transaction tests, Python validator tests and static pack validation. The latest workflow run passed. These modules are not yet connected to a Bedrock Script API event, machine entity, persistent in-world storage or inventory UI. The rollback logic is best-effort only: it cannot guarantee recovery from a world/process crash or from a storage adapter that partially commits inventory changes. Normal ore drops are unchanged. Android, Windows Bedrock and BDS behavior remain untested.
+
+
+## Early power generation and closed-loop steam plant
+
+The initial AETHERIUM power progression has three complementary early generators: the **Steam Generator** (fuel-fired), **Wind Turbine** (fuel-free) and **Solar Generator** (daytime fuel-free). All produce the shared Aetherium Energy Unit (AEU). These are design definitions, not yet working in-world machines.
+
+The Steam Generator is a multi-block industrial chain rather than a single block that consumes water:
+
+1. The **Water Pump** moves the initially filled working water through connected pipes into the **Boiler**.
+2. The Boiler burns fuel and heats water into steam.
+3. Pressurized steam drives the **Steam Turbine**, which turns a generator and produces AEU.
+4. The **Condenser** cools exhaust steam back into water.
+5. The pump recirculates that same water to the Boiler.
+
+The loop needs an initial water fill but does not continuously consume water during normal sealed operation. It must never create water from nothing. A detected leak or broken pipe stops the plant safely and reports the problem rather than silently deleting water.
+
+To avoid a startup deadlock, the pump can be started with a manual hand crank. Once steam pressure is available, a mechanical shaft from the turbine drives the pump. The pump is an auxiliary load: net AEU output must account for internal mechanical/electrical demand. The plant cannot produce energy while cold, idle or without steam pressure. The condenser needs cooling; ambient-air cooling is the baseline, with a water-cooling upgrade as a later option. Its cooling loop is separate from the sealed working-water loop.
+
+## Automatic Wood Cutter and fuel supply
+
+The **Wood Cutter** is a powered tree-farming machine, not a handheld axe and not a machine that clears an entire forest. The player marks a small configurable tree plot and supplies saplings. It harvests only mature, recognized trees inside that plot, operates within a bounded number of block operations per tick, collects actual drops, replants from its sapling slot, and waits for regrowth. It pauses when output storage is full and never cuts outside the plot or replaces unknown blocks.
+
+The cutter outputs logs, sticks and recovered saplings. A future **Wood Processor** can turn surplus logs into wood chips, while a **Charcoal Kiln** converts logs into charcoal. The Boiler can also accept ordinary logs, charcoal, coal and coal blocks from the start, so players are not forced to build the complete automation chain before getting their first steam power.
+
+Recommended progression: **Wood Cutter → Wood Processor → Charcoal Kiln → Boiler → Steam Turbine → AEU network**. Directly feeding logs into the Boiler remains possible. Charcoal and wood-chip efficiency values are left for balancing after in-game tests.
+
+The Wood Cutter must not break containers, AETHERIUM machines, or player-placed blocks outside its marked plot. Chunk loading is not enabled by default, and work while the world is closed is not promised.
+
+## Power-generation implementation status
+
+The design contracts are stored in `behavior_pack/power/steam_power_system.json` and `behavior_pack/industry/wood_cutter.json`. The companion tests validate the closed-loop rules, safe startup, accepted fuels, turbine requirements and tree replanting constraints. These files are design-only: Bedrock Script API machine events, persistent inventories, pipe networks, water simulation, models, textures and in-game UI still need implementation and Android/BDS testing. Static validation does not mean these machines are already usable in-game.
