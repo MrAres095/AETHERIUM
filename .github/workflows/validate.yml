@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Run Grinder unit tests
-        run: node --test tools/test_grinder_processor.js tools/test_grinder_transaction.js tools/test_upgrade_evaluator.js tools/test_grinder_registry.js tools/test_machine_registry.js tools/test_industry_catalogue.js tools/test_power_quarry_design.js tools/test_energy_ledger.js tools/test_tool_battery_state.js tools/test_manual_grinder.js
+        run: node --test tools/test_grinder_processor.js tools/test_grinder_transaction.js tools/test_upgrade_evaluator.js tools/test_grinder_registry.js tools/test_machine_registry.js tools/test_industry_catalogue.js tools/test_power_quarry_design.js tools/test_energy_ledger.js tools/test_tool_battery_state.js tools/test_manual_grinder.js tools/test_power_generation.js
       - name: Run pack-validator unit tests
         run: python -m unittest discover -s tools -p "test_*.py" -v
       - name: Validate Bedrock pack structure
