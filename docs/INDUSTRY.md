@@ -122,3 +122,37 @@ The initial balancing target for the early Steam Generator is **900 AEU/t gross*
 When generation is temporarily insufficient, the power distributor prioritizes active machines and reduces or pauses battery charging first. It must not drain the battery to zero merely to keep charging itself. The generator must still have fuel and a functioning closed water/steam circuit.
 
 The Wood Cutter automatically applies supplied **Bone Meal** to each newly replanted valid sapling. Bone Meal is taken from a dedicated input slot, used only on valid saplings, and consumed normally. It repeats application while the tree is growing and stops once the tree is mature or the Bone Meal supply runs out. With no Bone Meal, the cutter falls back to natural growth and reports the shortage; it never creates Bone Meal. This makes the farm faster without making its fertilizer supply infinite.
+
+
+## Farming and mob automation family
+
+AETHERIUM farming automation is divided into three independent branches so players can build only the machines they need.
+
+### Crop farms
+
+- **Planter** plants real seeds on valid farmland or supported soil.
+- **Irrigation Unit** supplies a configurable growth modifier from a connected water source/tank; it does not consume water every tick.
+- **Fertilizer Station** automatically applies supplied Bone Meal to supported growing crops, consuming real Bone Meal only when the growth action succeeds.
+- **Harvester** collects mature crop drops and replants from matching seeds. It pauses safely when output storage is full.
+
+The first supported crop list includes wheat, carrots, potatoes, beetroot, Nether Wart, sugar cane, pumpkins and melons. Each crop needs its own correct harvest/replant behavior; unsupported plants must be skipped, not broken.
+
+### Animal farms
+
+- **Animal Feeder** uses real food items and respects normal breeding cooldowns.
+- **Livestock Manager** maintains a player-configured population cap and pauses breeding when the enclosure is full.
+- **Product Collector** gathers non-lethal products such as eggs and wool. The first version does not automatically kill livestock; milking can be added through a safe interaction adapter later.
+
+Initial animals: cows, sheep, pigs and chickens. The system must not harm animals or collect outside the configured enclosure.
+
+### Mob farms
+
+- **Mob Attractor** routes existing eligible hostile mobs into a farm; it never spawns or duplicates mobs.
+- **Mob Sorter** separates configured mob types and sends unknown types through a safe bypass.
+- **Mob Damager** deals actual configurable damage. It does not directly manufacture drops or experience.
+- **Loot Collector** collects only real item drops and pauses before storage fills.
+- **Experience Collector** collects existing XP orbs into an XP cell or transfers them to the player; it never creates XP.
+
+The first target mobs are zombies, skeletons, creepers, spiders, witches and endermen. Vanilla spawning rules remain authoritative. Named pets and player-owned mobs are excluded by default. Farm machines use AEU and stop safely without power. Chunk loading remains disabled by default and no work while the world is closed is promised.
+
+The machine contracts are in behavior_pack/industry/farming_system.json; tools/test_farming_system.js checks the safety rules. They are design-only until their Bedrock Script API events, inventories, models, textures and UI are implemented and tested in-game.
