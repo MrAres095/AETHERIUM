@@ -3,12 +3,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { planItemTransfer, executeItemTransfer } = require("../behavior_pack/scripts/item_transfer.js");
 
-function adapter(slots, failWrite = false) {
+function adapter(slots, failWriteCount = 0) {
+  let failuresRemaining = failWriteCount;
   return {
     slots: slots.map(x => x ? { ...x } : null),
     readSlots() { return this.slots.map(x => x ? { ...x } : null); },
     writeSlots(next) {
-      if (failWrite) throw new Error("write failed");
+      if (failuresRemaining > 0) { failuresRemaining -= 1; throw new Error("write failed"); }
       this.slots = next.map(x => x ? { ...x } : null);
     },
   };
@@ -22,6 +23,7 @@ test("extractor transfers existing items into a compatible partial stack", () =>
   );
   assert.equal(result.ok, true);
   assert.equal(result.movedItems, 20);
+  assert.equal(result.movedStacks, 1);
   assert.equal(result.sourceAfter[0], null);
   assert.equal(result.destinationAfter[0].amount, 64);
   assert.equal(result.destinationAfter[1].amount, 16);
@@ -72,7 +74,7 @@ test("source write failure rolls destination back", () => {
 
 test("destination write failure leaves source untouched", () => {
   const source = adapter([{ typeId: "minecraft:coal", amount: 8 }]);
-  const destination = adapter([null], true);
+  const destination = adapter([null], 1);
   assert.equal(executeItemTransfer(source, destination).reason, "destination_write_failed_rolled_back");
   assert.equal(source.slots[0].amount, 8);
 });
