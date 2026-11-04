@@ -168,3 +168,10 @@ The Mob Spawn Amplifier increases valid spawn-attempt frequency (target multipli
 ### Item transfer implementation milestone
 
 An engine-independent transaction prototype now exists at `behavior_pack/scripts/item_transfer.js`. It plans bounded transfers across source/destination slot arrays, supports whitelist/blacklist and destination item acceptance, merges compatible stacks, and writes destination before consuming source. It attempts rollback if either write fails. The adapter contract requires synchronous atomic slot-array writes; this is not crash-safe and is not yet connected to Bedrock block components, real container inventories, machine block entities, AEU ticking or a persistent in-game buffer. The two-block design remains the Item Extractor and Item Inserter.
+
+
+### Crafting recipes for the first Logistics blocks
+
+The Item Extractor and Item Inserter now have separate shaped crafting recipes. The Extractor uses an Aetherium Ingot as its core, with Iron Ingots and Redstone around it. The Inserter uses an Aetherium Crystal core with Iron Ingots and a Redstone circuit pattern. Both are registered as crafting-table recipes and return their corresponding placed machine block.
+
+Static recipe validation explicitly allows the small documented vanilla ingredient set (currently Iron Ingot and Redstone), while still requiring every AETHERIUM ingredient and every recipe output to be registered. This is a pack-integrity check only; recipe discovery and crafting still need verification in the Bedrock client.
