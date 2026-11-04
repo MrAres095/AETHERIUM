@@ -163,3 +163,8 @@ The machine contracts are in behavior_pack/industry/farming_system.json; tools/t
 Logistics uses two adjacent machine blocks only: Item Extractor pulls from a configured neighboring inventory face; Item Inserter pushes into a configured neighboring inventory face. Both support whitelist/blacklist filters, a persistent small buffer and bounded transfer cycles. No minecarts, rails, wireless transfer or chunk scanning are used. Transfers validate destination capacity before committing source removal and fail safely for unsupported inventories.
 
 The Mob Spawn Amplifier increases valid spawn-attempt frequency (target multipliers 2x/4x/8x) with local mob caps of 16/32/48 and AEU costs of 100/250/500 per tick. It still checks valid spawn positions, mob-specific conditions, difficulty, game rules, player distance and server safety limits. These are design targets, not measured in-game rates; Script API implementation and performance testing remain outstanding.
+
+
+### Item transfer implementation milestone
+
+An engine-independent transaction prototype now exists at `behavior_pack/scripts/item_transfer.js`. It plans bounded transfers across source/destination slot arrays, supports whitelist/blacklist and destination item acceptance, merges compatible stacks, and writes destination before consuming source. It attempts rollback if either write fails. The adapter contract requires synchronous atomic slot-array writes; this is not crash-safe and is not yet connected to Bedrock block components, real container inventories, machine block entities, AEU ticking or a persistent in-game buffer. The two-block design remains the Item Extractor and Item Inserter.
