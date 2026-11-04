@@ -43,3 +43,15 @@ texture is still needed; the GitHub text-file workflow cannot safely create a
 binary PNG texture. The block is placeable as a static decorative prototype,
 but extraction logic, energy consumption, facing configuration, and real
 inventory access are not implemented yet.
+
+## Item Inserter — second geometry prototype
+
+Asset: `resource_pack/models/blocks/aetherium_item_inserter.geo.json`
+
+The Inserter has its own geometry identifier and matching Behavior Pack block,
+loot table, and English display name. Its side service port is mirrored so the
+two machines are distinguishable when placed side by side.
+
+Both machine blocks currently reuse the existing crystal-block texture as a
+temporary placeholder. Neither block has inventory transfer or AEU behavior
+wired into Bedrock yet.
