@@ -103,7 +103,62 @@ function validateWirelessRoute(nodes, maxSegmentLength = 16) {
   return { ok: true, segments: nodes.length - 1, maxSegmentLength };
 }
 
+
+const TOOL_BATTERY_PROFILES = Object.freeze({
+  drill: Object.freeze({ capacity: 20000, maxInputPerTick: 250, energyPerUse: 100 }),
+  chainsaw: Object.freeze({ capacity: 30000, maxInputPerTick: 300, energyPerUse: 150 }),
+});
+
+function createToolBattery(toolId, stored = 0) {
+  const profile = TOOL_BATTERY_PROFILES[toolId];
+  if (!profile) return { ok: false, reason: "unknown_energy_tool" };
+  if (!isSafeNonNegativeInteger(stored) || stored > profile.capacity) {
+    return { ok: false, reason: "invalid_stored_energy" };
+  }
+  return { ok: true, battery: { toolId, ...profile, stored } };
+}
+
+function validateToolBattery(battery) {
+  if (!battery || !TOOL_BATTERY_PROFILES[battery.toolId]) return false;
+  const profile = TOOL_BATTERY_PROFILES[battery.toolId];
+  return battery.capacity === profile.capacity
+    && battery.maxInputPerTick === profile.maxInputPerTick
+    && battery.energyPerUse === profile.energyPerUse
+    && isSafeNonNegativeInteger(battery.stored) && battery.stored <= profile.capacity;
+}
+
+// A tool action is atomic: it either has its full energy cost or does not run.
+function consumeToolEnergy(battery, uses = 1) {
+  if (!validateToolBattery(battery)) return { ok: false, reason: "invalid_tool_battery" };
+  if (!Number.isSafeInteger(uses) || uses < 1) return { ok: false, reason: "invalid_use_count" };
+  const required = battery.energyPerUse * uses;
+  if (!Number.isSafeInteger(required)) return { ok: false, reason: "invalid_use_count" };
+  if (battery.stored < required) {
+    return { ok: true, consumed: 0, required, canRun: false, reason: "insufficient_charge", battery: { ...battery } };
+  }
+  return { ok: true, consumed: required, required, canRun: true,
+    battery: { ...battery, stored: battery.stored - required } };
+}
+
+// A powered station supplies at most its own output limit; the tool also
+// enforces its input limit and capacity. The caller persists both returned states.
+function chargeToolAtStation(stationBattery, toolBattery, requested) {
+  if (!validateBattery(stationBattery)) return { ok: false, reason: "invalid_station_battery" };
+  if (!validateToolBattery(toolBattery)) return { ok: false, reason: "invalid_tool_battery" };
+  if (!isSafeNonNegativeInteger(requested)) return { ok: false, reason: "invalid_energy_amount" };
+  const accepted = Math.min(requested, stationBattery.maxOutputPerTick,
+    stationBattery.stored, toolBattery.maxInputPerTick,
+    toolBattery.capacity - toolBattery.stored);
+  return {
+    ok: true, transferred: accepted,
+    station: { ...stationBattery, stored: stationBattery.stored - accepted },
+    tool: { ...toolBattery, stored: toolBattery.stored + accepted },
+  };
+}
+
 module.exports = {
-  BATTERY_TIERS, createBattery, validateBattery, chargeBattery, dischargeBattery,
-  transferEnergy, transferWirelessHop, validateWirelessRoute,
+  BATTERY_TIERS, TOOL_BATTERY_PROFILES, createBattery, validateBattery,
+  chargeBattery, dischargeBattery, transferEnergy, transferWirelessHop,
+  validateWirelessRoute, createToolBattery, validateToolBattery,
+  consumeToolEnergy, chargeToolAtStation,
 };
