@@ -156,3 +156,10 @@ Initial animals: cows, sheep, pigs and chickens. The system must not harm animal
 The first target mobs are zombies, skeletons, creepers, spiders, witches and endermen. Vanilla spawning rules remain authoritative. Named pets and player-owned mobs are excluded by default. Farm machines use AEU and stop safely without power. Chunk loading remains disabled by default and no work while the world is closed is promised.
 
 The machine contracts are in behavior_pack/industry/farming_system.json; tools/test_farming_system.js checks the safety rules. They are design-only until their Bedrock Script API events, inventories, models, textures and UI are implemented and tested in-game.
+
+
+## Direct-block logistics and accelerated mob farms
+
+Logistics uses two adjacent machine blocks only: Item Extractor pulls from a configured neighboring inventory face; Item Inserter pushes into a configured neighboring inventory face. Both support whitelist/blacklist filters, a persistent small buffer and bounded transfer cycles. No minecarts, rails, wireless transfer or chunk scanning are used. Transfers validate destination capacity before committing source removal and fail safely for unsupported inventories.
+
+The Mob Spawn Amplifier increases valid spawn-attempt frequency (target multipliers 2x/4x/8x) with local mob caps of 16/32/48 and AEU costs of 100/250/500 per tick. It still checks valid spawn positions, mob-specific conditions, difficulty, game rules, player distance and server safety limits. These are design targets, not measured in-game rates; Script API implementation and performance testing remain outstanding.
