@@ -113,3 +113,12 @@ The Wood Cutter must not break containers, AETHERIUM machines, or player-placed 
 ## Power-generation implementation status
 
 The design contracts are stored in `behavior_pack/power/steam_power_system.json` and `behavior_pack/industry/wood_cutter.json`. The companion tests validate the closed-loop rules, safe startup, accepted fuels, turbine requirements and tree replanting constraints. These files are design-only: Bedrock Script API machine events, persistent inventories, pipe networks, water simulation, models, textures and in-game UI still need implementation and Android/BDS testing. Static validation does not mean these machines are already usable in-game.
+
+
+## Steam generator output target and automatic tree growth
+
+The initial balancing target for the early Steam Generator is **900 AEU/t gross**. The boiler/pump/condenser plant allowance is 100 AEU/t, leaving **800 AEU/t net**. The design target reserves 150 AEU/t for each of two continuously operating early machines (300 AEU/t combined) and up to 500 AEU/t surplus for a Tier I battery. At that target, a 100,000 AEU Tier I battery can fill from empty in 200 ticks (10 seconds at 20 ticks/second), provided the machines are running at the assumed load and the battery accepts its full 500 AEU/t input. These are initial balance targets, not measured in-game performance; actual machine consumption and generator output must be tested and tuned together.
+
+When generation is temporarily insufficient, the power distributor prioritizes active machines and reduces or pauses battery charging first. It must not drain the battery to zero merely to keep charging itself. The generator must still have fuel and a functioning closed water/steam circuit.
+
+The Wood Cutter automatically applies supplied **Bone Meal** to each newly replanted valid sapling. Bone Meal is taken from a dedicated input slot, used only on valid saplings, and consumed normally. It repeats application while the tree is growing and stops once the tree is mature or the Bone Meal supply runs out. With no Bone Meal, the cutter falls back to natural growth and reports the shortage; it never creates Bone Meal. This makes the farm faster without making its fertilizer supply infinite.
