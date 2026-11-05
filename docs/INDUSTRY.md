@@ -294,3 +294,10 @@ This is deliberately a direct AEU-network machine, not an AE2 integration or wir
 ### Charging Station state persistence contract
 
 The Charging Station now has a bounded, versioned serialization format for its occupied tool slot. The saved payload contains only the station schema and the inserted tool's trusted identifier plus stored AEU; tool capacity and input limits are rebuilt from the shared tool definitions when restored. Empty stations are represented explicitly. Malformed, oversized, unsupported or invalid tool payloads are rejected rather than silently replacing a charged tool with an empty one. This is still a persistence contract for the future Bedrock block-entity/world adapter: actual dynamic-property registration, save/load hooks and break/place item hand-off remain to be connected and tested in-game.
+
+
+## Powered handheld tool action safety
+
+The shared `powered_tool_action.js` adapter now provides a single guarded path for an electric handheld tool to perform a world action. It validates the item's own saved battery identity, checks the complete AEU cost, writes the reduced charge back to the same item, and only then invokes the supplied world-action callback. Multi-block actions must request their complete use count up front; partial charge never permits a partial action.
+
+The ordering deliberately favors world/item safety: if the engine callback throws after the charge has been committed, the energy remains spent. This avoids replaying a destructive action against an uncommitted battery state. The adapter does not itself mine blocks, damage entities, register Bedrock events or make a tool usable in-game; those operations still require a real Script API integration. Tests cover persistence-before-action, insufficient charge, callback failure, identity mismatch and multi-use costs.
