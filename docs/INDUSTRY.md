@@ -314,3 +314,6 @@ The drill family has three explicit operating profiles:
 The action planner charges only for blocks that passed the runtime's eligibility checks. For example, a 3×3 action with only four valid blocks costs 400 AEU, not 900. The runtime must still enforce world permissions, block/tool compatibility, protection rules, and vanilla drop behavior before passing the eligible count to the planner.
 
 Supported drill module identifiers are Speed, Fortune, Silk Touch, Efficiency, Area and Energy Cell. Fortune and Silk Touch are mutually exclusive. This commit validates module identities and the conflict; exact module effects, crafting recipes, upgrade slots and in-world installation remain to be integrated and balanced. These profiles and tests are engine-independent and do not yet register functional drill items in Bedrock.
+
+
+The new `drill_action.js` adapter connects the drill mode planner to the shared powered-tool energy gate. Basic mode invokes the action without requiring a battery. Advanced and Ultimate modes reserve the full 100 AEU-per-eligible-block cost before invoking the runtime callback. No eligible blocks means no callback and no energy use; insufficient charge blocks the entire action. The callback still owns the actual Bedrock block edits and must perform all protection, permission, range and vanilla-drop checks first.
