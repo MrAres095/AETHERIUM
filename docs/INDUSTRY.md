@@ -317,3 +317,10 @@ Supported drill module identifiers are Speed, Fortune, Silk Touch, Efficiency, A
 
 
 The new `drill_action.js` adapter connects the drill mode planner to the shared powered-tool energy gate. Basic mode invokes the action without requiring a battery. Advanced and Ultimate modes reserve the full 100 AEU-per-eligible-block cost before invoking the runtime callback. No eligible blocks means no callback and no energy use; insufficient charge blocks the entire action. The callback still owns the actual Bedrock block edits and must perform all protection, permission, range and vanilla-drop checks first.
+
+
+## Aetherium Chainsaw action adapter
+
+The engine-independent `chainsaw_action.js` adapter routes one Chainsaw operation through the shared powered-tool energy gate. Each operation costs the Chainsaw profile's **150 AEU**; the 30,000 AEU battery and 300 AEU/t input limit remain defined by the shared tool profile. Charge is persisted before the world callback, and an undercharged or mismatched item cannot perform the action. If the callback fails after energy is committed, the energy remains spent to avoid replaying a destructive action against stale battery state.
+
+The callback must be supplied by the future Bedrock runtime after it has checked target block compatibility, permissions, range and vanilla drops. This adapter deliberately does not assume tree-vein cutting, a number of blocks per swing, or a speed multiplier; those behaviors still need design and in-game balancing. Five unit tests cover cost, insufficient charge, tool identity, callback failure and invalid callbacks. The adapter is an engine-independent prototype, not yet an in-game registered Chainsaw item.
