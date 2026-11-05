@@ -100,3 +100,25 @@ test("invalid power and corrupt station states fail closed", () => {
   assert.equal(runChargingStationTick({ version: 99, tool: null }, 10).reason, "invalid_station_state");
   assert.equal(insertToolIntoChargingStation(emptyStation(), {}).reason, "invalid_tool_battery");
 });
+
+test("station persistence restores the inserted tool and exact stored charge", () => {
+  const inserted = insertToolIntoChargingStation(emptyStation(), tool("chainsaw", 12345));
+  const encoded = require("../behavior_pack/scripts/charging_station.js")
+    .serializeChargingStationState(inserted.state);
+  assert.equal(encoded.ok, true);
+  const restored = require("../behavior_pack/scripts/charging_station.js")
+    .deserializeChargingStationState(encoded.state);
+  assert.equal(restored.ok, true);
+  assert.equal(restored.state.tool.toolId, "chainsaw");
+  assert.equal(restored.state.tool.stored, 12345);
+});
+
+test("station persistence restores an empty station and rejects corrupt payloads", () => {
+  const api = require("../behavior_pack/scripts/charging_station.js");
+  const encoded = api.serializeChargingStationState(emptyStation());
+  assert.equal(encoded.ok, true);
+  assert.equal(api.deserializeChargingStationState(encoded.state).state.tool, null);
+  assert.equal(api.deserializeChargingStationState("{").reason, "malformed_persistent_state");
+  assert.equal(api.deserializeChargingStationState(JSON.stringify({ schema: 99, tool: null })).ok, false);
+  assert.equal(api.deserializeChargingStationState("x".repeat(5000)).ok, false);
+});
