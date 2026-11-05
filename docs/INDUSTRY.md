@@ -309,14 +309,14 @@ The drill family has three explicit operating profiles:
 
 - **Basic Drill:** 1×1 mining, no battery and no AEU cost.
 - **Advanced Drill:** 3×3 mining, powered; the current balance target is 100 AEU per eligible block.
-- **Ultimate Drill:** 3×3 mining, powered at the same base AEU cost, with a 1.5× speed target and vein-mining capability.
+- **Ultimate Drill:** 3×3 mining, powered at the same base AEU cost, with a 1.5× speed target and optional Vein Miner.
 
-The action planner charges only for blocks that passed the runtime's eligibility checks. For example, a 3×3 action with only four valid blocks costs 400 AEU, not 900. The runtime must still enforce world permissions, block/tool compatibility, protection rules, and vanilla drop behavior before passing the eligible count to the planner.
+Vein Miner is OFF by default and can be toggled ON/OFF for the Ultimate Drill. OFF keeps the normal 3×3 limit. ON lets the runtime include connected, eligible blocks of the same ore vein, with a hard limit of 64 blocks per action. Basic and Advanced do not support Vein Miner in the current progression. At 100 AEU per eligible block, a full 64-block vein action costs at most 6,400 AEU; if the battery cannot cover the complete action, nothing is mined. The runtime must check ore identity, connectivity, permissions, protection rules and vanilla drops before passing the eligible count to the planner.
 
 Supported drill module identifiers are Speed, Fortune, Silk Touch, Efficiency, Area and Energy Cell. Fortune and Silk Touch are mutually exclusive. This commit validates module identities and the conflict; exact module effects, crafting recipes, upgrade slots and in-world installation remain to be integrated and balanced. These profiles and tests are engine-independent and do not yet register functional drill items in Bedrock.
 
 
-The new `drill_action.js` adapter connects the drill mode planner to the shared powered-tool energy gate. Basic mode invokes the action without requiring a battery. Advanced and Ultimate modes reserve the full 100 AEU-per-eligible-block cost before invoking the runtime callback. No eligible blocks means no callback and no energy use; insufficient charge blocks the entire action. The callback still owns the actual Bedrock block edits and must perform all protection, permission, range and vanilla-drop checks first.
+The new `drill_action.js` adapter connects the drill mode planner to the shared powered-tool energy gate. Basic mode invokes the action without requiring a battery. Advanced and Ultimate modes reserve the full 100 AEU-per-eligible-block cost before invoking the runtime callback. The optional Vein Miner flag is the fifth argument to `runDrillAction` and defaults to false. Normal mode is limited to the drill area; enabled Ultimate Vein Miner is capped at 64 connected eligible blocks. No eligible blocks means no callback and no energy use; insufficient charge blocks the entire action. The callback still owns the actual Bedrock block edits and must perform all protection, permission, range, connectivity and vanilla-drop checks first.
 
 
 ## Aetherium Chainsaw action adapter
