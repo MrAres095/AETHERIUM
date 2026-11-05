@@ -5,9 +5,11 @@ const {
   createBattery,
   chargeToolAtStation,
 } = require("./energy_ledger.js");
+const { serializeToolBattery, deserializeToolBattery } = require("./tool_battery_state.js");
 
 const CHARGING_STATION_STATE_VERSION = 1;
 const CHARGING_STATION_MAX_INPUT_PER_TICK = 500;
+const CHARGING_STATION_STATE_MAX_LENGTH = 4096;
 
 function cloneTool(tool) {
   return tool ? { ...tool } : null;
@@ -27,6 +29,46 @@ function createChargingStationState(tool = null) {
     ok: true,
     state: { version: CHARGING_STATION_STATE_VERSION, tool: cloneTool(tool) },
   };
+}
+
+/** Serialize the station and its inserted tool so the runtime can persist it across unloads/restarts. */
+function serializeChargingStationState(state) {
+  if (!validateChargingStationState(state)) return { ok: false, reason: "invalid_station_state" };
+  const payload = {
+    schema: CHARGING_STATION_STATE_VERSION,
+    tool: null,
+  };
+  if (state.tool !== null) {
+    const encoded = serializeToolBattery(state.tool);
+    if (!encoded.ok) return encoded;
+    payload.tool = JSON.parse(encoded.state);
+  }
+  const serialized = JSON.stringify(payload);
+  if (serialized.length > CHARGING_STATION_STATE_MAX_LENGTH) {
+    return { ok: false, reason: "station_state_too_large" };
+  }
+  return { ok: true, state: serialized };
+}
+
+/** Restore station state; malformed or mismatched tool payloads never reset silently. */
+function deserializeChargingStationState(rawState) {
+  if (typeof rawState !== "string" || rawState.length === 0
+    || rawState.length > CHARGING_STATION_STATE_MAX_LENGTH) {
+    return { ok: false, reason: "invalid_persistent_state" };
+  }
+  let parsed;
+  try { parsed = JSON.parse(rawState); } catch {
+    return { ok: false, reason: "malformed_persistent_state" };
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)
+    || parsed.schema !== CHARGING_STATION_STATE_VERSION
+    || !(parsed.tool === null || (parsed.tool && typeof parsed.tool === "object" && !Array.isArray(parsed.tool)))) {
+    return { ok: false, reason: "unsupported_persistent_state" };
+  }
+  if (parsed.tool === null) return createChargingStationState();
+  const restored = deserializeToolBattery(JSON.stringify(parsed.tool), parsed.tool.toolId);
+  if (!restored.ok) return restored;
+  return createChargingStationState(restored.battery);
 }
 
 /** Insert one supported handheld tool. An occupied station never overwrites it. */
@@ -116,6 +158,8 @@ module.exports = {
   CHARGING_STATION_MAX_INPUT_PER_TICK,
   validateChargingStationState,
   createChargingStationState,
+  serializeChargingStationState,
+  deserializeChargingStationState,
   insertToolIntoChargingStation,
   extractToolFromChargingStation,
   runChargingStationTick,
