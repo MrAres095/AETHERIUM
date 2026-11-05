@@ -79,7 +79,10 @@ test("accounts for cable loss when charging and discharging a local buffer", () 
   assert.equal(result.cableSourceRequired, 112);
   assert.equal(result.cableLoss, 12);
   assert.equal(result.delivered, 100);
-  assert.equal(result.buffer.stored, 200);
+  assert.equal(result.bufferCharged, 349);
+  assert.equal(result.chargeSourceRequired, 388);
+  assert.equal(result.chargeCableLoss, 39);
+  assert.equal(result.buffer.stored, 549);
 });
 
 test("rejects invalid source budgets and batteries", () => {
