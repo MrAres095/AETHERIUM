@@ -301,3 +301,16 @@ The Charging Station now has a bounded, versioned serialization format for its o
 The shared `powered_tool_action.js` adapter now provides a single guarded path for an electric handheld tool to perform a world action. It validates the item's own saved battery identity, checks the complete AEU cost, writes the reduced charge back to the same item, and only then invokes the supplied world-action callback. Multi-block actions must request their complete use count up front; partial charge never permits a partial action.
 
 The ordering deliberately favors world/item safety: if the engine callback throws after the charge has been committed, the energy remains spent. This avoids replaying a destructive action against an uncommitted battery state. The adapter does not itself mine blocks, damage entities, register Bedrock events or make a tool usable in-game; those operations still require a real Script API integration. Tests cover persistence-before-action, insufficient charge, callback failure, identity mismatch and multi-use costs.
+
+
+## Aetherium handheld drill progression
+
+The drill family has three explicit operating profiles:
+
+- **Basic Drill:** 1×1 mining, no battery and no AEU cost.
+- **Advanced Drill:** 3×3 mining, powered; the current balance target is 100 AEU per eligible block.
+- **Ultimate Drill:** 3×3 mining, powered at the same base AEU cost, with a 1.5× speed target and vein-mining capability.
+
+The action planner charges only for blocks that passed the runtime's eligibility checks. For example, a 3×3 action with only four valid blocks costs 400 AEU, not 900. The runtime must still enforce world permissions, block/tool compatibility, protection rules, and vanilla drop behavior before passing the eligible count to the planner.
+
+Supported drill module identifiers are Speed, Fortune, Silk Touch, Efficiency, Area and Energy Cell. Fortune and Silk Touch are mutually exclusive. This commit validates module identities and the conflict; exact module effects, crafting recipes, upgrade slots and in-world installation remain to be integrated and balanced. These profiles and tests are engine-independent and do not yet register functional drill items in Bedrock.
