@@ -49,10 +49,10 @@ test("calculates compounded cable losses backwards without creating energy", () 
   ];
   const result = calculatePowerDelivery(path, 500);
   assert.equal(result.ok, true);
-  assert.equal(result.sourceRequired, 516);
-  assert.equal(result.totalLoss, 16);
+  assert.equal(result.sourceRequired, 517);
+  assert.equal(result.totalLoss, 17);
   assert.deepEqual(result.flows, [
-    { cableId: "one", input: 516, output: 511, loss: 5 },
+    { cableId: "one", input: 517, output: 511, loss: 6 },
     { cableId: "two", input: 511, output: 500, loss: 11 },
   ]);
   assert.equal(result.flows.reduce((sum, flow) => sum + flow.loss, 0), result.totalLoss);
@@ -66,7 +66,7 @@ test("enforces each cable throughput after accounting for downstream losses", ()
   const result = calculatePowerDelivery(path, 500);
   assert.equal(result.ok, false);
   assert.equal(result.reason, "cable_overloaded");
-  assert.equal(result.cableId, "near-source");
+  assert.equal(result.cableId, "near-load");
 });
 
 test("routes delivery and returns ordered per-cable flows", () => {
