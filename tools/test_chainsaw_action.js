@@ -103,3 +103,27 @@ test("invalid callback leaves chainsaw charge untouched", () => {
   assert.equal(result.reason, "invalid_tool_action");
   assert.equal(readToolBatteryFromItem(item, "chainsaw").battery.stored, 500);
 });
+
+const { setVeinMinerEnabled } = require("../behavior_pack/scripts/tool_settings.js");
+
+test("Chainsaw action automatically uses the saved Vein Miner preference", () => {
+  const item = makeChainsaw(3000);
+  setVeinMinerEnabled(item, "chainsaw", true);
+  let cut = 0;
+  const result = runChainsawAction(item, undefined, 8, count => { cut = count; });
+  assert.equal(result.ok, true);
+  assert.equal(result.plan.veinMinerEnabled, true);
+  assert.equal(cut, 8);
+  assert.equal(result.consumed, 1200);
+});
+
+test("Chainsaw saved OFF preference keeps single-log behavior", () => {
+  const item = makeChainsaw(3000);
+  setVeinMinerEnabled(item, "chainsaw", false);
+  let cut = 0;
+  const result = runChainsawAction(item, undefined, 8, count => { cut = count; });
+  assert.equal(result.ok, true);
+  assert.equal(result.plan.veinMinerEnabled, false);
+  assert.equal(cut, 1);
+  assert.equal(result.consumed, 150);
+});
