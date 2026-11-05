@@ -50,18 +50,23 @@ function routePowerWithBuffer(input) {
   const unmet = requestedAtDestination - delivered;
 
   const sourceRemaining = availableSourceEnergy - cablePlan.sourceRequired;
+  const remainingCableCapacity = route.path.map((cable, index) => ({
+    ...cable,
+    maxTransferPerTick: cable.maxTransferPerTick - (cablePlan.flows[index]?.input ?? 0),
+  }));
   let nextBuffer = discharge.battery;
   let bufferCharged = 0;
   let chargeCablePlan = { sourceRequired: 0, totalLoss: 0, flows: [] };
   if (sourceRemaining > 0 && nextBuffer.stored < nextBuffer.capacity) {
     const room = Math.min(nextBuffer.maxInputPerTick, nextBuffer.capacity - nextBuffer.stored);
+    const hasCableCapacity = remainingCableCapacity.every(cable => cable.maxTransferPerTick > 0);
     const chargeDelivery = route.path.length === 0
       ? Math.min(room, sourceRemaining)
-      : maxDeliverable(route.path, room, sourceRemaining);
+      : hasCableCapacity ? maxDeliverable(remainingCableCapacity, room, sourceRemaining) : 0;
     if (chargeDelivery > 0) {
       chargeCablePlan = route.path.length === 0
         ? { ok: true, sourceRequired: chargeDelivery, totalLoss: 0, flows: [] }
-        : calculatePowerDelivery(route.path, chargeDelivery);
+        : calculatePowerDelivery(remainingCableCapacity, chargeDelivery);
       if (!chargeCablePlan.ok) return chargeCablePlan;
       const charge = chargeBattery(nextBuffer, chargeDelivery);
       if (!charge.ok) return { ok: false, reason: "buffer_charge_failed" };
