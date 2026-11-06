@@ -10,6 +10,7 @@ function isEnergy(value) {
  * Allocate one network tick: internal plant load, prioritized machine demand,
  * battery discharge for shortages, then battery charging from true surplus.
  * Lower machine priority numbers are served first; ties use stable IDs.
+ * Batteries are also processed in stable ID order, independent of input order.
  */
 function dispatchPowerTick(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
@@ -25,11 +26,13 @@ function dispatchPowerTick(input) {
   if (!isEnergy(internalLoad)) return { ok: false, reason: "invalid_internal_load" };
 
   let grossGeneration = 0;
+  const seenGeneratorIds = new Set();
   for (const generator of generators) {
-    if (!generator || typeof generator.id !== "string" || !generator.id
-      || !isEnergy(generator.outputPerTick)) {
-      return { ok: false, reason: "invalid_generator" };
+    if (!generator || typeof generator.id !== "string" || !generator.id.trim()
+      || seenGeneratorIds.has(generator.id) || !isEnergy(generator.outputPerTick)) {
+      return { ok: false, reason: "invalid_or_duplicate_generator" };
     }
+    seenGeneratorIds.add(generator.id);
     grossGeneration += generator.outputPerTick;
     if (!Number.isSafeInteger(grossGeneration)) return { ok: false, reason: "energy_total_overflow" };
   }
@@ -37,18 +40,19 @@ function dispatchPowerTick(input) {
   const seenBatteryIds = new Set();
   const workingBatteries = [];
   for (const entry of batteries) {
-    if (!entry || typeof entry.id !== "string" || !entry.id || seenBatteryIds.has(entry.id)
+    if (!entry || typeof entry.id !== "string" || !entry.id.trim() || seenBatteryIds.has(entry.id)
       || !validateBattery(entry.battery)) {
       return { ok: false, reason: "invalid_or_duplicate_battery" };
     }
     seenBatteryIds.add(entry.id);
     workingBatteries.push({ id: entry.id, battery: { ...entry.battery } });
   }
+  workingBatteries.sort((a, b) => a.id.localeCompare(b.id));
 
   const seenMachineIds = new Set();
   const orderedMachines = [];
   for (const machine of machines) {
-    if (!machine || typeof machine.id !== "string" || !machine.id
+    if (!machine || typeof machine.id !== "string" || !machine.id.trim()
       || seenMachineIds.has(machine.id) || !isEnergy(machine.demandPerTick)
       || (machine.priority !== undefined && !Number.isSafeInteger(machine.priority))) {
       return { ok: false, reason: "invalid_or_duplicate_machine" };
