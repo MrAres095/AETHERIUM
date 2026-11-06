@@ -67,19 +67,34 @@ test("battery discharge obeys per-tick output cap and reports unmet demand", () 
   assert.equal(result.batteries[0].battery.stored, 500);
 });
 
-test("multiple batteries charge in order and full batteries accept no energy", () => {
+test("multiple batteries charge in stable ID order, not caller input order", () => {
   const result = dispatchPowerTick({
     generators: [{ id: "gen", outputPerTick: 1200 }],
     machines: [{ id: "machine", demandPerTick: 200 }],
     batteries: [
-      { id: "full", battery: createBattery(1, 100000).battery },
-      { id: "second", battery: createBattery(1).battery },
+      { id: "z-full", battery: createBattery(1, 100000).battery },
+      { id: "a-second", battery: createBattery(1).battery },
     ],
   });
   assert.equal(result.totalBatteryCharged, 500);
-  assert.equal(result.batteries[0].battery.stored, 100000);
-  assert.equal(result.batteries[1].battery.stored, 500);
+  assert.deepEqual(result.batteries.map(x => x.id), ["a-second", "z-full"]);
+  assert.equal(result.batteries[0].battery.stored, 500);
+  assert.equal(result.batteries[1].battery.stored, 100000);
   assert.equal(result.unusedGeneration, 500);
+});
+
+test("battery discharge order is stable by ID", () => {
+  const result = dispatchPowerTick({
+    generators: [],
+    machines: [{ id: "load", demandPerTick: 500 }],
+    batteries: [
+      { id: "z-last", battery: createBattery(1, 500).battery },
+      { id: "a-first", battery: createBattery(1, 500).battery },
+    ],
+  });
+  assert.deepEqual(result.batteries.map(x => [x.id, x.battery.stored]), [
+    ["a-first", 0], ["z-last", 500],
+  ]);
 });
 
 test("internal plant load is paid before machines and deficit is reported", () => {
@@ -97,7 +112,10 @@ test("internal plant load is paid before machines and deficit is reported", () =
 test("invalid and duplicate network entries fail closed", () => {
   assert.equal(dispatchPowerTick(null).reason, "invalid_dispatch_input");
   assert.equal(dispatchPowerTick({ generators: [{ id: "g", outputPerTick: -1 }] }).reason,
-    "invalid_generator");
+    "invalid_or_duplicate_generator");
+  assert.equal(dispatchPowerTick({ generators: [
+    { id: "g", outputPerTick: 10 }, { id: "g", outputPerTick: 20 },
+  ] }).reason, "invalid_or_duplicate_generator");
   assert.equal(dispatchPowerTick({ batteries: [
     { id: "b", battery: createBattery(1).battery },
     { id: "b", battery: createBattery(1).battery },
