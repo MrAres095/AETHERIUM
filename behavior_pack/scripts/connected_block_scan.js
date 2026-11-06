@@ -25,6 +25,7 @@ function scanConnectedBlocks(options = {}) {
 
   const directions = DIRECTIONS[connectivity];
   const queue = [{ x: origin.x, y: origin.y, z: origin.z }];
+  const queued = new Set([key(origin)]);
   const visited = new Set();
   const positions = [];
   let originBlock;
@@ -52,7 +53,11 @@ function scanConnectedBlocks(options = {}) {
     positions.push({ x: p.x, y: p.y, z: p.z });
     for (const [dx, dy, dz] of directions) {
       const next = { x: p.x + dx, y: p.y + dy, z: p.z + dz };
-      if (!visited.has(key(next))) queue.push(next);
+      const nextKey = key(next);
+      if (!visited.has(nextKey) && !queued.has(nextKey)) {
+        queued.add(nextKey);
+        queue.push(next);
+      }
     }
   }
   return { ok: true, positions, visited: visited.size, truncated: positions.length === maxBlocks && queue.length > 0 };
