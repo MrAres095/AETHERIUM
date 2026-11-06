@@ -48,19 +48,29 @@ test("changed block during preflight prevents all edits",()=>{
   assert.equal(s.broken.length,0);
 });
 test("revalidates each block immediately before its edit",()=>{
-  const s=setup({getBlockAt:(x,y,z)=>x===1?undefined:{id:"iron"}});
+  const calls = new Map();
+  const s=setup({getBlockAt:(x,y,z)=>{
+    const k=x+","+y+","+z;
+    const n=(calls.get(k)||0)+1;
+    calls.set(k,n);
+    if (x===1 && n===2) return undefined;
+    return {id:"iron"};
+  }});
   const r=executeScannedBlockAction({ok:true,positions},s.options);
   assert.equal(r.reason,"block_changed_during_action");
   assert.equal(r.executed,1);
   assert.equal(s.broken.length,1);
 });
 test("rechecks protection immediately before each edit",()=>{
-  let checks=0;
-  const s=setup({canBreak:()=>++checks===1});
+  const checks = [0,0];
+  const s=setup({canBreak:(_b,_p,i)=>{
+    checks[i]++;
+    return checks[i] <= (i===0 ? 2 : 1);
+  }});
   const r=executeScannedBlockAction({ok:true,positions},s.options);
   assert.equal(r.reason,"protection_changed_during_action");
-  assert.equal(r.executed,0);
-  assert.equal(s.broken.length,0);
+  assert.equal(r.executed,1);
+  assert.equal(s.broken.length,1);
 });
 test("a rejected block action reports partial progress without retrying",()=>{
   const s=setup({breakBlock:()=>false});
