@@ -127,3 +127,43 @@ test("Chainsaw saved OFF preference keeps single-log behavior", () => {
   assert.equal(cut, 1);
   assert.equal(result.consumed, 150);
 });
+
+
+const { runChainsawScanAction } = require("../behavior_pack/scripts/chainsaw_action.js");
+
+test("Chainsaw scan sends exact connected diagonal log coordinates to the action", () => {
+  const item = makeChainsaw(3000);
+  setVeinMinerEnabled(item, "chainsaw", true);
+  const blocks = new Map([
+    ["0,0,0", { id: "oak_log" }],
+    ["1,1,0", { id: "oak_log" }],
+    ["1,1,1", { id: "oak_log" }],
+    ["1,0,0", { id: "birch_log" }],
+  ]);
+  const cut = [];
+  const result = runChainsawScanAction(item, {
+    origin: {x:0,y:0,z:0},
+    getBlockAt: (x,y,z) => blocks.get(x + "," + y + "," + z),
+    isEligible: (block, origin) => block.id === origin.id,
+  }, positions => cut.push(...positions));
+  assert.equal(result.ok, true);
+  assert.equal(result.ran, true);
+  assert.deepEqual(cut, [{x:0,y:0,z:0},{x:1,y:1,z:0},{x:1,y:1,z:1}]);
+  assert.equal(result.consumed, 450);
+});
+
+test("Chainsaw scan checks only the target log when saved Vein Miner is off", () => {
+  const item = makeChainsaw(1000);
+  setVeinMinerEnabled(item, "chainsaw", false);
+  let lookups = 0;
+  const cut = [];
+  const result = runChainsawScanAction(item, {
+    origin: {x:0,y:0,z:0},
+    getBlockAt: () => { lookups++; return {id:"oak_log"}; },
+    isEligible: () => true,
+  }, positions => cut.push(...positions));
+  assert.equal(result.ok, true);
+  assert.deepEqual(cut, [{x:0,y:0,z:0}]);
+  assert.equal(lookups, 1);
+  assert.equal(result.consumed, 150);
+});
