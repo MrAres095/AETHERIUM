@@ -39,7 +39,6 @@ test("Ultimate Drill saved OFF preference keeps the 3x3 limit", () => {
 
 
 const { runDrillVeinMinerScan } = require("../behavior_pack/scripts/drill_action.js");
-const { setVeinMinerEnabled } = require("../behavior_pack/scripts/tool_settings.js");
 
 test("Ultimate Drill scan sends exact connected ore coordinates to the action", () => {
   const item = makeDrill(5000);
