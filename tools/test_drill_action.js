@@ -36,3 +36,42 @@ test("Ultimate Drill saved OFF preference keeps the 3x3 limit", () => {
   assert.equal(mined, 9);
   assert.equal(result.consumed, 900);
 });
+
+
+const { runDrillVeinMinerScan } = require("../behavior_pack/scripts/drill_action.js");
+const { setVeinMinerEnabled } = require("../behavior_pack/scripts/tool_settings.js");
+
+test("Ultimate Drill scan sends exact connected ore coordinates to the action", () => {
+  const item = makeDrill(5000);
+  setVeinMinerEnabled(item, "drill", true, "ultimate");
+  const blocks = new Map([
+    ["0,0,0", { id: "iron_ore" }],
+    ["1,0,0", { id: "iron_ore" }],
+    ["1,1,0", { id: "iron_ore" }],
+    ["0,0,1", { id: "gold_ore" }],
+  ]);
+  const mined = [];
+  const result = runDrillVeinMinerScan(item, {
+    origin: { x: 0, y: 0, z: 0 },
+    getBlockAt: (x, y, z) => blocks.get(x + "," + y + "," + z),
+    isEligible: (block, origin) => block.id === origin.id,
+  }, positions => { mined.push(...positions); });
+  assert.equal(result.ok, true);
+  assert.equal(result.ran, true);
+  assert.deepEqual(mined, [{x:0,y:0,z:0},{x:1,y:0,z:0},{x:1,y:1,z:0}]);
+  assert.equal(result.consumed, 300);
+  assert.equal(result.scan.positions.length, 3);
+});
+
+test("Ultimate Drill scan refuses to scan when saved Vein Miner is off", () => {
+  const item = makeDrill(5000);
+  setVeinMinerEnabled(item, "drill", false, "ultimate");
+  let lookups = 0;
+  const result = runDrillVeinMinerScan(item, {
+    origin: {x:0,y:0,z:0},
+    getBlockAt: () => { lookups++; return {id:"iron_ore"}; },
+    isEligible: () => true,
+  }, () => {});
+  assert.equal(result.reason, "vein_miner_disabled");
+  assert.equal(lookups, 0);
+});
