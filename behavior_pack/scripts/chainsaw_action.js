@@ -2,9 +2,10 @@
 
 const { runPoweredToolAction } = require("./powered_tool_action.js");
 const { getVeinMinerEnabled } = require("./tool_settings.js");
+const { scanConnectedBlocks, MAX_CONNECTED_BLOCKS } = require("./connected_block_scan.js");
 
 const CHAINSAW_ENERGY_PER_BLOCK = 150;
-const CHAINSAW_VEIN_MAX_BLOCKS = 64;
+const CHAINSAW_VEIN_MAX_BLOCKS = MAX_CONNECTED_BLOCKS;
 
 function planChainsawAction(veinMinerEnabled, eligibleBlockCount, maxBlocks = CHAINSAW_VEIN_MAX_BLOCKS) {
   if (typeof veinMinerEnabled !== "boolean") return { ok: false, reason: "invalid_vein_miner_setting" };
@@ -17,8 +18,7 @@ function planChainsawAction(veinMinerEnabled, eligibleBlockCount, maxBlocks = CH
 
 /**
  * When veinMinerEnabled is omitted, read the saved preference from this
- * Chainsaw ItemStack. Supplying an explicit boolean remains supported for
- * deterministic tests and controlled runtime calls.
+ * Chainsaw ItemStack. Supplying an explicit boolean remains supported.
  */
 function runChainsawAction(itemStack, veinMinerEnabled, eligibleBlockCount, action) {
   if (typeof action !== "function") return { ok: false, reason: "invalid_tool_action" };
@@ -35,4 +35,28 @@ function runChainsawAction(itemStack, veinMinerEnabled, eligibleBlockCount, acti
   return { ...powered, plan };
 }
 
-module.exports = { CHAINSAW_ENERGY_PER_BLOCK, CHAINSAW_VEIN_MAX_BLOCKS, planChainsawAction, runChainsawAction };
+/**
+ * Scans only the target log when Vein Miner is off; when enabled, scans a
+ * connected tree. The action callback receives exact coordinates, not a
+ * count from which it would need to rediscover the blocks.
+ */
+function runChainsawScanAction(itemStack, scanOptions, action) {
+  if (typeof action !== "function") return { ok: false, reason: "invalid_tool_action" };
+  if (!scanOptions || typeof scanOptions !== "object") return { ok: false, reason: "invalid_scan_options" };
+  const saved = getVeinMinerEnabled(itemStack, "chainsaw");
+  if (!saved.ok) return saved;
+  const scan = scanConnectedBlocks({
+    ...scanOptions,
+    connectivity: saved.enabled ? "all" : "face",
+    maxBlocks: saved.enabled ? MAX_CONNECTED_BLOCKS : 1,
+  });
+  if (!scan.ok) return scan;
+  const result = runChainsawAction(itemStack, saved.enabled, scan.positions.length,
+    (count, plan) => action(scan.positions.slice(0, count), plan));
+  return { ...result, scan };
+}
+
+module.exports = {
+  CHAINSAW_ENERGY_PER_BLOCK, CHAINSAW_VEIN_MAX_BLOCKS,
+  planChainsawAction, runChainsawAction, runChainsawScanAction,
+};
