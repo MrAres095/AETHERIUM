@@ -52,7 +52,7 @@ function validateMachineRegistry(registry) {
     }
 
     if (!isSafeRecipeRegistryPath(machine.recipe_registry) ||
-        !/^behavior_pack\\/[a-z0-9_./-]+\\.json$/.test(machine.recipe_registry)) {
+        !/^behavior_pack\/[a-z0-9_./-]+\.json$/.test(machine.recipe_registry)) {
       return { ok: false, reason: "invalid_machine_recipe_registry" };
     }
   }
@@ -62,13 +62,12 @@ function validateMachineRegistry(registry) {
 
 function isSafeRecipeRegistryPath(value) {
   if (typeof value !== "string" || !value.startsWith("behavior_pack/") ||
-      !value.endsWith(".json") || value.includes("\\\\")) {
+      !value.endsWith(".json") || value.includes("\\")) {
     return false;
   }
   const parts = value.split("/");
   return parts.every(part => part && part !== "." && part !== "..");
 }
-
 function getMachine(registry, id) {
   const validation = validateMachineRegistry(registry);
   if (!validation.ok) return null;
