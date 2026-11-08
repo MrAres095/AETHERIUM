@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { validateMachineRegistry, getMachine } =
+const { validateMachineRegistry, getMachine, isSafeRecipeRegistryPath } =
   require("../behavior_pack/scripts/machine_registry.js");
 
 const registry = {
@@ -80,6 +80,15 @@ test("rejects malformed recipe registry paths", () => {
   const invalid = structuredClone(registry);
   invalid.machines[0].recipe_registry = "../../secrets.json";
   assert.equal(validateMachineRegistry(invalid).reason, "invalid_machine_recipe_registry");
+});
+
+test("rejects recipe registry paths that escape the behavior pack", () => {
+  const invalid = structuredClone(registry);
+  invalid.machines[0].recipe_registry = "behavior_pack/../../outside.json";
+  assert.equal(validateMachineRegistry(invalid).reason, "invalid_machine_recipe_registry");
+  assert.equal(isSafeRecipeRegistryPath("behavior_pack/industry/grinder_recipes.json"), true);
+  assert.equal(isSafeRecipeRegistryPath("behavior_pack/../outside.json"), false);
+  assert.equal(isSafeRecipeRegistryPath("behavior_pack\\\\outside.json"), false);
 });
 
 test("rejects an empty catalogue", () => {
