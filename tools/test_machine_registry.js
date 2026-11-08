@@ -88,7 +88,7 @@ test("rejects recipe registry paths that escape the behavior pack", () => {
   assert.equal(validateMachineRegistry(invalid).reason, "invalid_machine_recipe_registry");
   assert.equal(isSafeRecipeRegistryPath("behavior_pack/industry/grinder_recipes.json"), true);
   assert.equal(isSafeRecipeRegistryPath("behavior_pack/../outside.json"), false);
-  assert.equal(isSafeRecipeRegistryPath("behavior_pack\\\\outside.json"), false);
+  assert.equal(isSafeRecipeRegistryPath("behavior_pack\\outside.json"), false);
 });
 
 test("rejects an empty catalogue", () => {
