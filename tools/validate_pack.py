@@ -446,6 +446,89 @@ def validate_grinder_registry() -> None:
         if not isinstance(count, int) or isinstance(count, bool) or count < 1:
             error(f"{label}.count must be a positive integer")
 
+
+def validate_machine_catalogue() -> None:
+    """Validate shared machine definitions and every referenced recipe registry."""
+    relative = "behavior_pack/industry/machines.json"
+    data = read_json(relative)
+    if not data:
+        return
+    if data.get("schema_version") != 1:
+        error(f"{relative}: schema_version must be 1")
+    machines = data.get("machines")
+    if not isinstance(machines, list) or not machines:
+        error(f"{relative}: machines must be a non-empty list")
+        return
+
+    identifier_pattern = re.compile(r"[a-z0-9_.-]+:[a-z0-9_./-]+")
+    allowed_roles = {"speed", "yield", "energy"}
+    seen_ids: set[str] = set()
+    for index, machine in enumerate(machines):
+        label = f"{relative}: machines[{index}]"
+        if not isinstance(machine, dict):
+            error(f"{label} must be an object")
+            continue
+        machine_id = machine.get("id")
+        family = machine.get("family")
+        mode = machine.get("mode")
+        powered = machine.get("powered")
+        if not isinstance(machine_id, str) or not identifier_pattern.fullmatch(machine_id):
+            error(f"{label}.id must be a namespaced identifier")
+        elif machine_id in seen_ids:
+            error(f"{label}: duplicate machine id '{machine_id}'")
+        else:
+            seen_ids.add(machine_id)
+        if not isinstance(family, str) or not identifier_pattern.fullmatch(family):
+            error(f"{label}.family must be a namespaced identifier")
+        if mode not in {"manual", "electric"} or not isinstance(powered, bool) or powered != (mode == "electric"):
+            error(f"{label}: mode and powered flag are inconsistent")
+        for field in ("input_slots", "output_slots"):
+            value = machine.get(field)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                error(f"{label}.{field} must be a positive integer")
+
+        roles = machine.get("upgrade_slots")
+        if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
+            error(f"{label}.upgrade_slots must be a list of role names")
+            roles = []
+        if len(roles) != len(set(roles)) or any(role not in allowed_roles for role in roles):
+            error(f"{label}.upgrade_slots contains an unknown or duplicate role")
+        if mode == "manual" and roles:
+            error(f"{label}: manual machines cannot have power upgrade slots")
+        if mode == "electric" and set(roles) != allowed_roles:
+            error(f"{label}: electric machines require speed, yield, and energy upgrade slots")
+
+        recipe_path = machine.get("recipe_registry")
+        if not isinstance(recipe_path, str):
+            error(f"{label}.recipe_registry must be a relative JSON path")
+            continue
+        candidate = Path(recipe_path)
+        if (candidate.is_absolute() or candidate.suffix != ".json" or
+                not candidate.parts or candidate.parts[0] != "behavior_pack" or
+                any(part in {"", ".", ".."} for part in candidate.parts)):
+            error(f"{label}.recipe_registry must stay inside behavior_pack")
+            continue
+        resolved = (ROOT / candidate).resolve()
+        try:
+            resolved.relative_to((ROOT / "behavior_pack").resolve())
+        except ValueError:
+            error(f"{label}.recipe_registry must stay inside behavior_pack")
+            continue
+        if not resolved.is_file():
+            error(f"{label}: referenced recipe registry does not exist: {recipe_path}")
+            continue
+        registry = read_json(candidate.as_posix())
+        if not registry:
+            continue
+        if registry.get("schema_version") != 1:
+            error(f"{recipe_path}: schema_version must be 1")
+        if isinstance(family, str) and registry.get("machine") != family:
+            error(f"{label}: recipe registry machine does not match family '{family}'")
+        if not isinstance(registry.get("recipes"), list) or not registry.get("recipes"):
+            error(f"{recipe_path}: recipes must be a non-empty list")
+
+
+
 def validate_localization() -> None:
     relative = "resource_pack/texts/languages.json"
     languages = ROOT / relative
@@ -540,6 +623,7 @@ def main() -> int:
     validate_worldgen(blocks)
     validate_localization()
     validate_grinder_registry()
+    validate_machine_catalogue()
 
     for message in WARNINGS:
         print("WARN: " + message)
