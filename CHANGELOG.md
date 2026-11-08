@@ -9,6 +9,16 @@ All notable AETHERIUM project changes are recorded here.
 - Kept vanilla and AETHERIUM mining behavior unchanged pending implementation and Bedrock testing.
 
 
+
+## Unreleased – Shared machine catalogue integrity
+
+- Added static validation for the shared manual/electric machine catalogue.
+- Verify each machine's mode, power flag, input/output slots, and upgrade roles.
+- Check that recipe registry references exist inside the behavior pack and match the machine family.
+- Reject path traversal and malformed recipe registry paths in both the JavaScript Core contract and Python pack validator.
+- Added regression tests for invalid paths, missing registries, duplicate machine IDs, and incomplete electric upgrade slots.
+
+
 ## Unreleased – Universal Grinder design
 
 - Expanded the Grinder specification from Aetherium Ore only to all supported vanilla and AETHERIUM ores.
