@@ -272,6 +272,12 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("must stay inside behavior_pack" in message
                             for message in validator.ERRORS))
 
+    def test_machine_catalogue_rejects_windows_path_separators(self):
+        self.write_machine_catalogue("behavior_pack/industry\\\\..\\\\outside.json")
+        validator.validate_machine_catalogue()
+        self.assertTrue(any("must stay inside behavior_pack" in message
+                            for message in validator.ERRORS))
+
     def test_machine_catalogue_rejects_missing_recipe_registry(self):
         self.write_machine_catalogue("behavior_pack/industry/missing.json")
         validator.validate_machine_catalogue()
