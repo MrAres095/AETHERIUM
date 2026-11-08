@@ -235,6 +235,80 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("duplicate input mapping" in message for message in validator.ERRORS))
         self.assertTrue(any(".count must be a positive integer" in message for message in validator.ERRORS))
 
+
+    def write_machine_catalogue(self, recipe_registry="behavior_pack/industry/grinder_recipes.json"):
+        self.write_json("behavior_pack/industry/grinder_recipes.json", {
+            "schema_version": 1,
+            "machine": "aetherium:grinder",
+            "default_output_count": 2,
+            "recipes": [{
+                "input": "minecraft:iron_ore",
+                "output": "minecraft:raw_iron",
+                "count": 2,
+            }],
+        })
+        self.write_json("behavior_pack/industry/machines.json", {
+            "schema_version": 1,
+            "machines": [{
+                "id": "aetherium:manual_grinder",
+                "family": "aetherium:grinder",
+                "mode": "manual",
+                "powered": False,
+                "input_slots": 1,
+                "output_slots": 3,
+                "upgrade_slots": [],
+                "recipe_registry": recipe_registry,
+            }],
+        })
+
+    def test_valid_machine_catalogue_and_recipe_reference_pass(self):
+        self.write_machine_catalogue()
+        validator.validate_machine_catalogue()
+        self.assertEqual(validator.ERRORS, [])
+
+    def test_machine_catalogue_rejects_path_traversal(self):
+        self.write_machine_catalogue("../../outside.json")
+        validator.validate_machine_catalogue()
+        self.assertTrue(any("must stay inside behavior_pack" in message
+                            for message in validator.ERRORS))
+
+    def test_machine_catalogue_rejects_missing_recipe_registry(self):
+        self.write_machine_catalogue("behavior_pack/industry/missing.json")
+        validator.validate_machine_catalogue()
+        self.assertTrue(any("referenced recipe registry does not exist" in message
+                            for message in validator.ERRORS))
+
+    def test_machine_catalogue_rejects_duplicate_ids_and_incomplete_electric_upgrades(self):
+        self.write_machine_catalogue()
+        machines_path = self.root / "behavior_pack/industry/machines.json"
+        machines = json.loads(machines_path.read_text(encoding="utf-8"))
+        electric = dict(machines["machines"][0])
+        electric.update({
+            "mode": "electric",
+            "powered": True,
+            "upgrade_slots": ["speed", "yield"],
+        })
+        machines["machines"].append(electric)
+        machines_path.write_text(json.dumps(machines), encoding="utf-8")
+        validator.validate_machine_catalogue()
+        self.assertTrue(any("duplicate machine id" in message
+                            for message in validator.ERRORS))
+        self.assertTrue(any("require speed, yield, and energy" in message
+                            for message in validator.ERRORS))
+
+    def test_machine_catalogue_rejects_recipe_family_mismatch(self):
+        self.write_machine_catalogue()
+        self.write_json("behavior_pack/industry/grinder_recipes.json", {
+            "schema_version": 1,
+            "machine": "aetherium:other_machine",
+            "recipes": [{"input": "minecraft:iron_ore",
+                         "output": "minecraft:raw_iron", "count": 2}],
+        })
+        validator.validate_machine_catalogue()
+        self.assertTrue(any("does not match family" in message
+                            for message in validator.ERRORS))
+
+
     def test_worldgen_feature_and_rule_link(self):
         self.write_json("behavior_pack/features/aetherium_ore_feature.json", {
             "minecraft:ore_feature": {
