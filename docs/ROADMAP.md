@@ -44,6 +44,7 @@ Status key: `planned`, `in progress`, `implemented`, `tested`. Implemented means
 - [ ] Add Grinder machine appearance, interaction and inventory UI
 - [ ] Implement persistent, transactional recipe processing
 - [x] Add initial JSON ore-to-output registry and static validation
+- [x] Add shared manual/electric machine catalogue and static cross-reference validation
 - [ ] Connect the registry to the actual Grinder runtime
 - [ ] Implement safe input/output processing with no item loss or duplication
 - [ ] Test Grinder on Android, Windows, and Bedrock Dedicated Server
