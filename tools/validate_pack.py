@@ -503,8 +503,9 @@ def validate_machine_catalogue() -> None:
             error(f"{label}.recipe_registry must be a relative JSON path")
             continue
         candidate = Path(recipe_path)
-        if (candidate.is_absolute() or candidate.suffix != ".json" or
-                not candidate.parts or candidate.parts[0] != "behavior_pack" or
+        if (candidate.is_absolute() or "\\\\" in recipe_path or
+                candidate.suffix != ".json" or not candidate.parts or
+                candidate.parts[0] != "behavior_pack" or
                 any(part in {"", ".", ".."} for part in candidate.parts)):
             error(f"{label}.recipe_registry must stay inside behavior_pack")
             continue
