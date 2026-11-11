@@ -97,8 +97,9 @@ function validateWirelessRoute(nodes, maxSegmentLength = 16) {
   }
   for (let i = 1; i < nodes.length; i += 1) {
     const a = nodes[i - 1], b = nodes[i];
-    const distanceSquared = (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
-    if (distanceSquared > maxSegmentLength ** 2) return { ok: false, reason: "segment_out_of_range", segment: i - 1 };
+    // Math.hypot avoids squaring overflow for very large, but finite, coordinates.
+    const distance = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+    if (distance > maxSegmentLength) return { ok: false, reason: "segment_out_of_range", segment: i - 1 };
   }
   return { ok: true, segments: nodes.length - 1, maxSegmentLength };
 }
