@@ -3,6 +3,10 @@
 const { planGrind } = require("./grinder_processor.js");
 const activeStores = new WeakSet();
 
+function isDeclaredAsync(fn) {
+  return fn && fn.constructor && fn.constructor.name === "AsyncFunction";
+}
+
 function snapshotSlot(slot) {
   return slot && typeof slot === "object" ? { ...slot } : slot;
 }
@@ -34,6 +38,12 @@ function executeGrind(storage, recipeRegistry) {
       typeof storage.writeOutputs !== "function" ||
       typeof storage.writeInput !== "function") {
     return { ok: false, reason: "invalid_storage_adapter" };
+  }
+  // The transaction spans several inventory operations and cannot safely yield.
+  // Reject async methods before invoking any adapter code.
+  if ([storage.readInput, storage.readOutputs, storage.writeOutputs, storage.writeInput]
+    .some(isDeclaredAsync)) {
+    return { ok: false, reason: "async_storage_adapter_unsupported" };
   }
   if (activeStores.has(storage)) {
     return { ok: false, reason: "transaction_in_progress" };
