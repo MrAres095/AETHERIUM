@@ -58,6 +58,28 @@ test("calculates compounded cable losses backwards without creating energy", () 
   assert.equal(result.flows.reduce((sum, flow) => sum + flow.loss, 0), result.totalLoss);
 });
 
+test("preserves maximum safe-integer delivery exactly on lossless cables", () => {
+  const lossless = [{
+    id: "max-safe", from: "source", to: "load",
+    maxTransferPerTick: Number.MAX_SAFE_INTEGER, efficiencyBps: 10000,
+  }];
+  const result = calculatePowerDelivery(lossless, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.ok, true);
+  assert.equal(result.sourceRequired, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.totalLoss, 0);
+  assert.equal(result.flows[0].input, Number.MAX_SAFE_INTEGER);
+});
+
+test("rejects cable-loss calculations whose source requirement exceeds safe integers", () => {
+  const lossy = [{
+    id: "overflow", from: "source", to: "load",
+    maxTransferPerTick: Number.MAX_SAFE_INTEGER, efficiencyBps: 9999,
+  }];
+  const result = calculatePowerDelivery(lossy, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "energy_total_overflow");
+});
+
 test("enforces each cable throughput after accounting for downstream losses", () => {
   const path = [
     { id: "near-source", from: "a", to: "b", maxTransferPerTick: 510, efficiencyBps: 9900 },
