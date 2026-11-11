@@ -17,8 +17,8 @@ function validStack(slot, allowEmpty = true) {
   const maxAmount = slot.maxAmount ?? DEFAULT_STACK_LIMIT;
   return typeof slot.typeId === "string" &&
     ITEM_ID.test(slot.typeId) &&
-    Number.isInteger(slot.amount) && slot.amount > 0 &&
-    Number.isInteger(maxAmount) && maxAmount > 0 &&
+    Number.isSafeInteger(slot.amount) && slot.amount > 0 &&
+    Number.isSafeInteger(maxAmount) && maxAmount > 0 &&
     slot.amount <= maxAmount;
 }
 
@@ -45,12 +45,12 @@ function validateRecipeRegistry(registry) {
     if (!recipe || typeof recipe !== "object" || Array.isArray(recipe) ||
         typeof recipe.input !== "string" || !ITEM_ID.test(recipe.input) ||
         typeof recipe.output !== "string" || !ITEM_ID.test(recipe.output) ||
-        !Number.isInteger(recipe.count) || recipe.count < 1) {
+        !Number.isSafeInteger(recipe.count) || recipe.count < 1) {
       return "invalid_recipe_registry";
     }
 
     const maxStackSize = recipe.max_stack_size ?? DEFAULT_STACK_LIMIT;
-    if (!Number.isInteger(maxStackSize) || maxStackSize < 1 ||
+    if (!Number.isSafeInteger(maxStackSize) || maxStackSize < 1 ||
         maxStackSize > DEFAULT_STACK_LIMIT) {
       return "invalid_recipe_registry";
     }
