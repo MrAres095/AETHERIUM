@@ -159,3 +159,27 @@ test("does not accept a recipe output stack limit above the engine-safe default"
     { typeId: "minecraft:iron_ore", amount: 1 }, [null], badRegistry,
   ).reason, "invalid_recipe_registry");
 });
+
+test("rejects unsafe integer inventory quantities and stack limits", () => {
+  const unsafe = Number.MAX_SAFE_INTEGER + 1;
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: unsafe }, [null], registry,
+  ).reason, "invalid_input");
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1, maxAmount: unsafe }, [null], registry,
+  ).reason, "invalid_input");
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 },
+    [{ typeId: "minecraft:raw_iron", amount: unsafe }], registry,
+  ).reason, "invalid_output_inventory");
+});
+
+test("rejects recipe quantities outside JavaScript's safe integer range", () => {
+  const unsafeRegistry = { recipes: [
+    { input: "minecraft:iron_ore", output: "minecraft:raw_iron",
+      count: Number.MAX_SAFE_INTEGER + 1 },
+  ] };
+  assert.equal(planGrind(
+    { typeId: "minecraft:iron_ore", amount: 1 }, [null], unsafeRegistry,
+  ).reason, "invalid_recipe_registry");
+});
