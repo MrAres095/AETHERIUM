@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased – Power network integer precision
+
+- Calculate cable-loss requirements using exact quotient/remainder arithmetic to avoid floating-point rounding near the safe-integer limit.
+- Add regression tests for maximum safe-integer lossless delivery and source-energy overflow on lossy cables.
+
+
 ## Unreleased – Power buffer midpoint safety
 
 - Calculate binary-search midpoints without adding two potentially large safe integers.
