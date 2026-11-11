@@ -61,8 +61,8 @@ test("wireless hop accounts for transmission loss and relay battery limits", () 
 });
 
 test("wireless loss uses integer efficiency units and rejects excess decimal precision", () => {
-  const source = createBattery(1, 1000).battery;
-  const destination = createBattery(1).battery;
+  const source = createBattery(2, 1000).battery;
+  const destination = createBattery(2).battery;
   const precise = transferWirelessHop(source, destination, 900, 5.1234);
   assert.equal(precise.ok, true);
   assert.equal(precise.sent, 949);
