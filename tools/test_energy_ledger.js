@@ -38,6 +38,17 @@ test("wireless route limits each hop to 16 blocks in one dimension", () => {
   assert.equal(validateWirelessRoute([route[0], { ...route[1], x: 17 }]).reason, "segment_out_of_range");
 });
 
+test("wireless route rejects huge finite coordinates without squaring overflow", () => {
+  const hugeRoute = [
+    { dimension: "overworld", x: 0, y: 64, z: 0 },
+    { dimension: "overworld", x: 1e308, y: 64, z: 0 },
+  ];
+  const result = validateWirelessRoute(hugeRoute, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "segment_out_of_range");
+  assert.equal(result.segment, 0);
+});
+
 test("wireless hop accounts for transmission loss and relay battery limits", () => {
   const source = createBattery(2, 1000).battery;
   const relay = createBattery(1).battery;
