@@ -88,7 +88,14 @@ function calculatePowerDelivery(path, requestedAtDestination) {
   const reverseFlows = [];
   for (let index = path.length - 1; index >= 0; index -= 1) {
     const cable = path[index];
-    const input = Math.ceil((requiredAtSource * 10000) / cable.efficiencyBps);
+    // Split quotient and remainder so the scaled multiplication stays exact
+    // and does not round a safe integer down near Number.MAX_SAFE_INTEGER.
+    const whole = Math.floor(requiredAtSource / cable.efficiencyBps);
+    const remainder = requiredAtSource % cable.efficiencyBps;
+    const base = whole * 10000;
+    if (!Number.isSafeInteger(base)) return { ok: false, reason: "energy_total_overflow" };
+    const fractional = Math.ceil((remainder * 10000) / cable.efficiencyBps);
+    const input = base + fractional;
     if (!Number.isSafeInteger(input)) return { ok: false, reason: "energy_total_overflow" };
     if (input > cable.maxTransferPerTick) {
       return { ok: false, reason: "cable_overloaded", cableId: cable.id,
