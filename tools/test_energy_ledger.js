@@ -60,6 +60,19 @@ test("wireless hop accounts for transmission loss and relay battery limits", () 
   assert.equal(result.destination.stored, 190);
 });
 
+test("wireless loss uses integer efficiency units and rejects excess decimal precision", () => {
+  const source = createBattery(1, 1000).battery;
+  const destination = createBattery(1).battery;
+  const precise = transferWirelessHop(source, destination, 900, 5.1234);
+  assert.equal(precise.ok, true);
+  assert.equal(precise.sent, 949);
+  assert.equal(precise.delivered, 900);
+  assert.equal(precise.lost, 49);
+  const unsupportedPrecision = transferWirelessHop(source, destination, 10, 5.12345);
+  assert.equal(unsupportedPrecision.ok, false);
+  assert.equal(unsupportedPrecision.reason, "invalid_loss_percent_precision");
+});
+
 test("handheld tool battery profiles have bounded capacity and usage costs", () => {
   const drill = createToolBattery("drill");
   const saw = createToolBattery("chainsaw");
