@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased – Wireless route numeric safety
+
+- Use overflow-safe Euclidean distance checks for wireless relay segments with very large finite coordinates.
+- Add a regression test for coordinate squaring overflow.
+
 ## Unreleased – Power buffer edge-case coverage
 
 - Add regression coverage for direct same-node power delivery without cables, buffer-only supply when source energy is zero, and unsafe integer energy requests.
