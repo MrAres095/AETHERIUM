@@ -92,3 +92,22 @@ test("manual Grinder accepts the highest tick with a safe cooldown deadline", ()
   assert.equal(result.nextOperationTick, Number.MAX_SAFE_INTEGER);
   assert.equal(Number.isSafeInteger(result.nextOperationTick), true);
 });
+
+test("manual Grinder safely rejects a missing or non-object operation", () => {
+  assert.deepEqual(operateManualGrinder(null), {
+    ok: false,
+    reason: "invalid_operation",
+  });
+  assert.deepEqual(operateManualGrinder(undefined), {
+    ok: false,
+    reason: "invalid_operation",
+  });
+  assert.deepEqual(operateManualGrinder("manual"), {
+    ok: false,
+    reason: "invalid_operation",
+  });
+  assert.deepEqual(operateManualGrinder([]), {
+    ok: false,
+    reason: "invalid_operation",
+  });
+});
