@@ -7,7 +7,8 @@ function maxDeliverable(path, requestedLimit, sourceBudget) {
   let low = 0;
   let high = requestedLimit;
   while (low < high) {
-    const middle = Math.ceil((low + high) / 2);
+    // Keep the midpoint within the safe-integer range even when both bounds are large.
+    const middle = low + Math.ceil((high - low) / 2);
     const plan = calculatePowerDelivery(path, middle);
     const fits = plan.ok && plan.sourceRequired <= sourceBudget;
     if (fits) low = middle;
