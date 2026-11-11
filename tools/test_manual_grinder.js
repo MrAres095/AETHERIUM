@@ -75,3 +75,20 @@ test("manual Grinder rejects invalid tick state", () => {
     currentTick: -1,
   }), { ok: false, reason: "invalid_tick_state" });
 });
+
+test("manual Grinder rejects a tick that would overflow its cooldown deadline", () => {
+  assert.deepEqual(operateManualGrinder({
+    ...base,
+    currentTick: Number.MAX_SAFE_INTEGER - MANUAL_GRIND_COOLDOWN_TICKS + 1,
+  }), { ok: false, reason: "invalid_tick_state" });
+});
+
+test("manual Grinder accepts the highest tick with a safe cooldown deadline", () => {
+  const result = operateManualGrinder({
+    ...base,
+    currentTick: Number.MAX_SAFE_INTEGER - MANUAL_GRIND_COOLDOWN_TICKS,
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.nextOperationTick, Number.MAX_SAFE_INTEGER);
+  assert.equal(Number.isSafeInteger(result.nextOperationTick), true);
+});
