@@ -2,6 +2,11 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## Unreleased – Manual Grinder tick safety
+
+- Reject tick values that would make the next hand-operation cooldown deadline exceed JavaScript's safe-integer range.
+- Add boundary tests for the highest valid tick and the first invalid tick.
+
 ## Unreleased – Grinder registry expansion
 
 - Added Aetherium Ore → 2 Raw Aetherium Crystals to the universal Grinder registry.
@@ -82,5 +87,5 @@ All notable AETHERIUM project changes are recorded here.
 
 ## 0.1.0 – Initial foundation
 
-- Established the project structure, pack manifests, architecture, roadmap, and server-distribution notes.
+- Established the project structure, pack manifests, architecture, and server-distribution notes.
 - Added a minimal core test function.
