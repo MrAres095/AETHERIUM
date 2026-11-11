@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased – Grinder transaction adapter safety
+
+- Reject declared asynchronous storage adapter methods before any inventory operation runs; Grinder commits require a synchronous, non-yielding adapter.
+- Add a regression test proving an async write method is not invoked.
+
+
 All notable AETHERIUM project changes are recorded here.
 
 ## Unreleased – Grinder numeric safety
