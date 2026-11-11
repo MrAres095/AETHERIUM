@@ -202,3 +202,16 @@ test("rejects reentrant processing against the same storage object", () => {
   assert.equal(store.input, null);
   assert.equal(store.outputs[0].amount, 2);
 });
+
+
+test("rejects declared async storage methods before invoking the adapter", () => {
+  const store = makeStorage({ typeId: "minecraft:iron_ore", amount: 1 }, [null]);
+  let invoked = false;
+  store.writeOutputs = async () => { invoked = true; };
+
+  const result = executeGrind(store, recipes);
+  assert.deepEqual(result, { ok: false, reason: "async_storage_adapter_unsupported" });
+  assert.equal(invoked, false);
+  assert.equal(store.input.amount, 1);
+  assert.equal(store.outputs[0], null);
+});
