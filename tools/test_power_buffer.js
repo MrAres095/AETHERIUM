@@ -85,6 +85,21 @@ test("accounts for cable loss when charging and discharging a local buffer", () 
   assert.equal(result.buffer.stored, 549);
 });
 
+test("handles maximum safe-integer demand without midpoint overflow", () => {
+  const hugeCable = { ...cable, maxTransferPerTick: Number.MAX_SAFE_INTEGER };
+  const result = routePowerWithBuffer({
+    cables: [hugeCable], from: "generator", to: "machine",
+    requestedAtDestination: Number.MAX_SAFE_INTEGER,
+    availableSourceEnergy: Number.MAX_SAFE_INTEGER,
+    buffer: battery(0),
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.cableDelivered, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.delivered, Number.MAX_SAFE_INTEGER);
+  assert.equal(result.unmet, 0);
+  assert.equal(result.cableSourceRequired, Number.MAX_SAFE_INTEGER);
+});
+
 test("rejects invalid source budgets and batteries", () => {
   assert.equal(routePowerWithBuffer({
     cables: [cable], from: "generator", to: "machine",
