@@ -66,18 +66,36 @@ function transferWirelessHop(source, destination, requestedDelivery, lossPercent
   if (!Number.isFinite(lossPercent) || lossPercent < 0 || lossPercent >= 100) {
     return { ok: false, reason: "invalid_loss_percent" };
   }
+  // Store efficiency as integer units (four decimal places of a percentage)
+  // so large safe-integer transfers never depend on floating-point rounding.
+  const lossUnits = Math.round(lossPercent * 10000);
+  if (!Number.isSafeInteger(lossUnits)
+    || Math.abs(lossPercent - lossUnits / 10000) > 1e-10) {
+    return { ok: false, reason: "invalid_loss_percent_precision" };
+  }
   if (requestedDelivery === 0) {
     return { ok: true, sent: 0, delivered: 0, lost: 0, source: { ...source }, destination: { ...destination } };
   }
-  const efficiency = (100 - lossPercent) / 100;
-  const sourceLimitedDelivery = Math.floor(Math.min(source.maxOutputPerTick, source.stored) * efficiency);
+  const scale = 1000000;
+  const efficiencyUnits = scale - lossUnits;
+  const sourceBudget = Math.min(source.maxOutputPerTick, source.stored);
+  const sourceWhole = Math.floor(sourceBudget / scale);
+  const sourceRemainder = sourceBudget % scale;
+  const sourceLimitedDelivery = sourceWhole * efficiencyUnits
+    + Math.floor((sourceRemainder * efficiencyUnits) / scale);
   const destinationLimitedDelivery = Math.min(
     destination.maxInputPerTick,
     destination.capacity - destination.stored
   );
   const maxDeliverable = Math.min(sourceLimitedDelivery, destinationLimitedDelivery);
   const delivered = Math.min(requestedDelivery, maxDeliverable);
-  const sent = Math.ceil(delivered / efficiency);
+  const deliveryWhole = Math.floor(delivered / efficiencyUnits);
+  const deliveryRemainder = delivered % efficiencyUnits;
+  const sent = deliveryWhole * scale
+    + Math.ceil((deliveryRemainder * scale) / efficiencyUnits);
+  if (!Number.isSafeInteger(sent) || sent > sourceBudget) {
+    return { ok: false, reason: "wireless_transfer_overflow" };
+  }
   const lost = sent - delivered;
   return {
     ok: true, sent, delivered, lost, unmet: requestedDelivery - delivered,
