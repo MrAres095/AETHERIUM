@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased – Power buffer edge-case coverage
+
+- Add regression coverage for direct same-node power delivery without cables, buffer-only supply when source energy is zero, and unsafe integer energy requests.
+
+
 ## Unreleased – Grinder transaction adapter safety
 
 - Reject declared asynchronous storage adapter methods before any inventory operation runs; Grinder commits require a synchronous, non-yielding adapter.
