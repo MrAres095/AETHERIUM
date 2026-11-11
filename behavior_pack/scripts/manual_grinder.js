@@ -21,7 +21,9 @@ function operateManualGrinder({
   if (machineId !== MANUAL_GRINDER_ID) {
     return { ok: false, reason: "wrong_machine" };
   }
+  // Keep the scheduled cooldown tick representable as a safe integer too.
   if (!Number.isSafeInteger(currentTick) || currentTick < 0 ||
+      currentTick > Number.MAX_SAFE_INTEGER - MANUAL_GRIND_COOLDOWN_TICKS ||
       (lastOperationTick !== null &&
        (!Number.isSafeInteger(lastOperationTick) ||
         lastOperationTick < 0 || lastOperationTick > currentTick))) {
