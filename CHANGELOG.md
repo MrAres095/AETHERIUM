@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased – Power buffer midpoint safety
+
+- Calculate binary-search midpoints without adding two potentially large safe integers.
+- Add a regression test for maximum safe-integer power demand.
+
+
 ## Unreleased – Wireless route numeric safety
 
 - Use overflow-safe Euclidean distance checks for wireless relay segments with very large finite coordinates.
