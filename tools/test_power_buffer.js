@@ -95,3 +95,44 @@ test("rejects invalid source budgets and batteries", () => {
     requestedAtDestination: 10, availableSourceEnergy: 10, buffer: {},
   }).reason, "invalid_buffer_battery");
 });
+
+
+test("supports a local generator and consumer without a cable path", () => {
+  const result = routePowerWithBuffer({
+    cables: [], from: "machine-room", to: "machine-room",
+    requestedAtDestination: 75, availableSourceEnergy: 100,
+    buffer: battery(0),
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.cableDelivered, 75);
+  assert.equal(result.cableSourceRequired, 75);
+  assert.equal(result.bufferDelivered, 0);
+  assert.equal(result.unmet, 0);
+  assert.equal(result.bufferCharged, 25);
+  assert.equal(result.buffer.stored, 25);
+  assert.equal(result.unusedSourceEnergy, 0);
+});
+
+test("uses the local buffer when a direct source has no available energy", () => {
+  const result = routePowerWithBuffer({
+    cables: [], from: "machine-room", to: "machine-room",
+    requestedAtDestination: 60, availableSourceEnergy: 0,
+    buffer: battery(80),
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.cableDelivered, 0);
+  assert.equal(result.bufferDelivered, 60);
+  assert.equal(result.delivered, 60);
+  assert.equal(result.unmet, 0);
+  assert.equal(result.buffer.stored, 20);
+});
+
+test("rejects unsafe integer energy requests rather than rounding them", () => {
+  const result = routePowerWithBuffer({
+    cables: [cable], from: "generator", to: "machine",
+    requestedAtDestination: Number.MAX_SAFE_INTEGER + 1,
+    availableSourceEnergy: 100, buffer: battery(10),
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "invalid_energy_request");
+});
