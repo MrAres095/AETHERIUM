@@ -1,3 +1,7 @@
+## Unreleased
+- Wireless transfer loss calculations now use bounded integer efficiency units instead of floating-point division, preventing rounding drift in large transfer calculations. Loss percentages support up to four decimal places; unsupported precision is rejected explicitly.
+- Added coverage for precise wireless loss accounting and invalid loss precision.
+
 # Changelog
 
 ## Unreleased – Power network integer precision
