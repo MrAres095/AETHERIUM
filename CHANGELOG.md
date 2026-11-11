@@ -2,6 +2,11 @@
 
 All notable AETHERIUM project changes are recorded here.
 
+## Unreleased – Grinder numeric safety
+
+- Require safe integers for input/output stack quantities, stack limits, recipe output counts, and manual operation cooldown deadlines.
+- Add regression tests for values outside JavaScript's exact integer range.
+
 ## Unreleased – Manual Grinder tick safety
 
 - Reject tick values that would make the next hand-operation cooldown deadline exceed JavaScript's safe-integer range.
