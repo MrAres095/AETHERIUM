@@ -10,14 +10,18 @@ const MANUAL_GRIND_COOLDOWN_TICKS = 20;
  * This is deliberately engine-independent: a Bedrock interaction handler
  * supplies the inventory snapshots and commits the returned plan.
  */
-function operateManualGrinder({
-  machineId,
-  inputSlot,
-  outputSlots,
-  recipeRegistry,
-  currentTick,
-  lastOperationTick = null,
-}) {
+function operateManualGrinder(operation) {
+  if (!operation || typeof operation !== "object" || Array.isArray(operation)) {
+    return { ok: false, reason: "invalid_operation" };
+  }
+  const {
+    machineId,
+    inputSlot,
+    outputSlots,
+    recipeRegistry,
+    currentTick,
+    lastOperationTick = null,
+  } = operation;
   if (machineId !== MANUAL_GRINDER_ID) {
     return { ok: false, reason: "wrong_machine" };
   }
